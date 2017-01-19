@@ -1,2 +1,2 @@
-# schoof
+# Schoof
 Schoof's algorithm
