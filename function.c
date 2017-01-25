@@ -91,63 +91,79 @@
     }
 }*/
 
-void division_polynomial(fq_poly_t fk, fq_poly_t ecc, fq_poly_t frob, fq_poly_t f1, fq_poly_t f2, fq_poly_t f3, fq_poly_t f4, fmpz_t k, fq_ctx_t fq)
+void division_polynomial(fq_poly_t fk, fq_poly_t ecc, fq_poly_t frob, fq_poly_t f1, fq_poly_t f2, fq_poly_t f3, fq_poly_t f4, fq_poly_t f5, fmpz_t k, fq_ctx_t fq)
 {
-    fmpz_t n, tmp;
-    fq_poly_t fn_2, fn_1, fn, fn1, fn2, tmp_poly;
+    // Déclaration
+    fmpz_t i, n, tmp;
+    fq_poly_t fn_2, fn_1, fn, fn1, fn2, fn3, tmp_poly;
 
+    // On traite à part les cas de f0 à f5
     switch(fmpz_get_ui(k))
     {
+        case 0 :
+            fq_poly_set(fk, f0, fq); break;
+
         case 1 :
             fq_poly_set(fk, f1, fq); break;
-            
+
         case 2 :
             fq_poly_set(fk, f2, fq); break;
-            
+
         case 3 :
             fq_poly_set(fk, f3, fq); break;
-            
+
         case 4 :
             fq_poly_set(fk, f4, fq); break;
-            
+
+        case 5 :
+            fq_poly_set(fk, f5, fq); break;
+
         default :
-            printf("cas default :"); fmpz_print(k); printf("\n");
+            //printf("cas default :"); fmpz_print(k); printf("\n");
+
+            // Initialisation
+            fmpz_init_set_ui(i, 5);
             fmpz_init(n);
             fmpz_init(tmp);
 
+            fq_poly_init(fn_2, fq);
             fq_poly_init(fn_1, fq);
             fq_poly_init(fn, fq);
             fq_poly_init(fn1, fq);
             fq_poly_init(fn2, fq);
+            fq_poly_init(fn3, fq);
             fq_poly_init(tmp_poly, fq);
 
-            fmpz_divexact_ui(n, k, 2);
-            fmpz_print(n); printf("\n");
+            // Affection des valeurs initiales du polynôme de division
+            fq_poly_set(fn_2, f1, fq);
+            fq_poly_set(fn_1, f2, fq);
+            fq_poly_set(fn, f3, fq);
+            fq_poly_set(fn1, f4, fq);
+            fq_poly_set(fn2, f5, fq);
 
-            fmpz_sub_ui(tmp, n, 1); 
-            division_polynomial(fn_1, ecc, frob, f1, f2, f3, f4, tmp, fq); 
-            division_polynomial(fn, ecc, frob, f1, f2, f3, f4, n, fq); break;
-            fmpz_add_ui(tmp, n, 1);
-            division_polynomial(fn1, ecc, frob, f1, f2, f3, f4, tmp, fq);
-            fmpz_add_ui(tmp, n, 2);
-            division_polynomial(fn2, ecc, frob, f1, f2, f3, f4, tmp, fq);
-
-            if(fmpz_is_even(k))
+            // Itération sur le i
+            while(fmpz_cmp(i, k) < 0)
             {
-                fq_poly_init(fn_2, fq);
-
-                fmpz_sub_ui(tmp, n, 2); 
-                division_polynomial(fn_2, ecc, frob, f1, f2, f3, f4, tmp, fq);
-
-                fq_poly_sqr(fk, fn_1, fq);
-                fq_poly_mul(fk, fk, fn2, fq);
-                fq_poly_sqr(tmp_poly, fn1, fq);
-                fq_poly_mul(tmp_poly, tmp_poly, fn_2, fq);
-                fq_poly_sub(fk, fk, tmp_poly, fq);
-                fq_poly_mul(fk, fk, fn, fq);
-
-                fq_poly_clear(fn_2, fq);
-            }
+                /*if(fmpz_is_even(i)) 
+                {*/
+                    fq_poly_sqr(fk, fn_1, fq);
+                    fq_poly_mul(fk, fk, fn2, fq);
+                    fq_poly_sqr(tmp_poly, fn1, fq);
+                    fq_poly_mul(tmp_poly, tmp_poly, fn_2, fq);
+                    fq_poly_sub(fk, fk, tmp_poly, fq);
+                    fq_poly_mul(fk, fk, fn, fq);
+                    
+                    fq_poly_set(fn3, fk, 
+                    
+              /*  }*/
+                
+                
+                
+                
+                
+                
+                
+                
             else
             {
                 if(fmpz_is_even(n))

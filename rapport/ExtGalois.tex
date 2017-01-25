@@ -1,0 +1,54 @@
+﻿\chapter{Extension galoisienne d'un corps fini}
+\label{Extension galoisienne d'un corps fini}
+
+\section{Extension d'un corps fini}
+\label{Extension d'un corps fini}
+
+\newtheorem*{prop4}{Proposition 3.1.1}
+\begin{prop4}
+	Soient K et L deux corps finis de caractéristique $p$. On pose $\mid K\mid=q=p^{n}$ avec $n\geq1$.
+	\begin{enumerate}
+		\item Si $L$ est une extension de $K$, $\exists s\geq1$, tel que $\mid K\mid=q^{sn}=p^{n}$.
+					Tout élément de $L$ est algébrique sur $K$, de degré inférieur à ou égal à $s$.
+		\item Si $\exists s\geq1$, tel que $\mid L\mid=q^{s}=p^{sn}$, alors il existe un unique un sous-corps $L$ isomorphe à $K$.
+	\end{enumerate}
+\end{prop4}
+
+\newtheorem*{prop5}{Proposition 3.1.2}
+\begin{prop5}
+	Soient $K$ un corps fini et $L$ une extension fini de degré $s$ de K à $q^{s}$ éléments.
+
+	On a que $L$ est un corps de décomposition du polynômes $X^{q^{s}}-X$ sur $K$ et est une extension galoisienne de $K$.
+\end{prop5}
+\begin{proof}[Preuve]
+	Soit $P\in K[X]$ un polynôme irréductible.
+
+	Si $P$ possède une racine $x$ dans $L$, alors $P\mid X^{q^{s}}-X$ et donc se factorise en un produit de polynômes de degrés un dans $L[X]$.
+	De plus, $P$ a des racines simples qui sont les conjugués de $x$ sur $K$ donc dans $L$.
+	\end{proof}
+
+\section{Groupe de Galois d'un corps fini}
+\label{Groupe de Galois d'un corps fini}
+
+\newtheorem*{prop6}{Proposition 3.2.1}
+\begin{prop6}
+	Soient $K$ et $L$ deux corps finis avec $K\subset L$ tout deux de caractéristique $q$. On pose $\left|K\right|=q=p^{n}$ et $\left|L\right|=q^{s}$ avec $n,s\geq1$.
+
+	On a que le groupe de Galois $G=Gal(L\mid K)$ est cyclique d'ordre $s$ et engendré par l'automorphisme de Frobenius 
+$$\begin{array}{clcl}
+	\varphi_{q} : &\mathbb{F}_{q} &\longrightarrow &\mathbb{F}_{11}[X]\\
+								& x 						&\longmapsto		 &x^{q}\\
+\end{array}.$$.
+\end{prop6}
+
+\begin{proof}[Preuve]
+	Par construction, on a que l'extension $L/K$ est galoisienne de degré $s$.
+	Soit $\varphi_{q}$ l'automorphisme de Frobenius de $L$ et $G$ le groupe engendré par $\varphi_{q}$.
+	On a $\varphi_{q}^{s}(x)=x^{q}^{s}=x,\ \forall x\in L$, d'où $\varphi_{q}^{s}=id_{L}$.
+	D'autre part, si $1\leq k\leq s-1$, on a que $\varphi_{q}^{s}\neq id_{L}$ sinon pour tout $x\in L^{\ast}$ est d'ordre au plus $q^{k}-1$.
+	Or $L^{\ast}$ est cyclique, il possède ainsi un élément d'ordre $q^{s}-1$.
+
+	On a que $G$ possède donc au moins $s$ éléments, si $x$ engendre $L$, ses $s$ images par les puissances de $F$ sont distinctes comme conjugués de x sur $K$.
+	Puisque $[L:K]=s$ cela exclut l'existence d'autres éléments de $G$, car $x$ ne peut avoir d'autres conjugués.
+	Par conséquent, $\left|G\right|=s$.
+\end{proof}

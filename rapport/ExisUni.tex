@@ -1,0 +1,68 @@
+﻿\chapter{Existence et unicité d'un corps fini à q éléments}
+\label{Existence et unicité d'un corps fini à q éléments}
+
+	Dans cette section, nous allons démontrer l'existence et l'unicité (à isomorphisme près) d'un corps fini à $p^{n}=q$ éléments.
+\newline
+
+\newtheorem*{prop3}{Proposition 2.0.1}
+\begin{prop3}[Existence]
+	Soit $q=p^{n}$, il existe $\mathbb{F}_{q}$ un corps de décomposition du polynôme $X^{q}-X$ sur le corps premier $\mathbb{F}_{p}$ à $q$ éléments.
+	De plus, tout élément de $\mathbb{F}_{q}$ est racine de ce polynôme.
+\end{prop3}
+\begin{proof}[Preuve]
+Soit $q=p^{n}$ et soit $\overline{\mathbb{F}_{p}}$ une clôture algébrique de $\mathbb{F}_{q}$.
+On pose que $\mathbb{F}_{q}$ est un corps de décomposition dans $\overline{\mathbb{F}_{p}}$du polynôme $X^{q}-X$ sur ${\mathbb{F}_{p}}$.
+Comme son polynôme dérivé est égale à $-1$ toutes ses racines sont simples.
+Par conséquent, il y a $q$ racines distinctes de $X^{q}-X$ dans $\mathbb{F}_{q}$.
+
+Montrons alors que celles-ci forment un corps.
+
+On pose $\alpha,\beta\in \mathbb{F}_{q}$ deux racines de $X^{q}-X$, on a alors :
+$$(\alpha+\beta)^{q}-(\alpha+\beta)=\alpha^{q}+\beta^{q}-\alpha-\beta=\alpha+\beta-\alpha-\beta=0$$ et 
+$$(-\alpha)^{q}-(-\alpha)=(-1)^{q}\alpha^{q}+\alpha =$$
+\begin{itemize}
+	\item si $p$ pair : $-1=1$ dans $\mathbb{Z}/2\mathbb{Z}$ et $\alpha$ est une racine simple.
+	\item sinon $p$ impair : $(-1)^{q}=-1$ et $-\alpha$ est une racine simple.
+\end{itemize}
+
+Par ailleurs, $$(\alpha\beta)^{q}-\alpha\beta=\alpha^{q}\beta^{q}-\alpha\beta=\alpha\beta-\alpha\beta=0$$ et
+$$(\alpha^{-1})^{q}-\alpha^{-1}=(\alpha^{q})^{-1}-\alpha^{-1}=\alpha^{-1}-\alpha^{-1}=0\ avec\ \alpha\neq0.$$
+
+Les racines du polynôme $X^{q}-X$ forment un corps de décomposition sur $\mathbb{F}_{p}$ et engendre un corps à $q$ éléments qui est $\mathbb{F}_{q}$.
+\end{proof}
+
+\newtheorem*{theo2}{Théorème 2.0.2}
+\begin{theo2}[Unicité]
+	Tout corps $K$ fini à $q=p^{n}$ éléments est isomorphe à $\mathbb{F}_{q}$.
+\end{theo2}
+\begin{proof}[Preuve]
+	Nous allons montrer que tout corps $K$ fini à $q$ éléments est unique à isomorphisme près, ie. isomorphe à $\mathbb{F}_{q}$.
+	D'après la proposition (1.2.1), nous connaissons l'existence d'un générateur $x\in K^{*}$.
+
+	Soient 
+$\begin{array}{clcl}
+	\varphi : &\mathbb{F}_{p}[X] &\longrightarrow &K\\
+						& X 							&\longmapsto			&x\\
+\end{array}$
+l'homomorphisme surjectif, $P$ le polynôme minimal de $x$ sur $\mathbb{F}_{p}[X]$ et 
+$\psi :\ \mathbb{F}_{p}[X]/(P)\ \longrightarrow K$ la factorisation de $\varphi$ par la projection canonique $\pi :\ \mathbb{F}_{p}[X]\ \longrightarrow \mathbb{F}_{p}[X]/(P)$.
+	On obtient le diagramme suivant :
+
+$\xymatrix{
+	\mathbb{F}_{p}[X] \ar[rr]^\varphi \ar[dd]^{\varphi '} \ar[dr]^\pi & {} & K \\
+	{} & \mathbb{F}_{p}[X]/(P) \ar[ur]^\psi \ar[dl]_{\psi '}\\
+	K'
+	}$
+
+	D'après ce diagramme, $\psi$ est donc un isomorphisme.
+
+	Comme $x$ est d'ordre $q-1$, $x$ est racine $X^{q-1}-1$, par conséquent $P\mid X^{q-1}-1$.
+	Soit $K'$ un corps à $p^{r}$ éléments. Les $q-1$ éléments de $K'^{*}$ sont racines de $X^{q-1}-1$. Comme $P$ n'est pas le polynôme constant, il existe au moins $y\in K'^{*}$ une racine de $P$, d'où
+$\begin{array}{clcl}
+	\varphi' : &\mathbb{F}_{p}[X] &\longrightarrow &K'\\
+						& X 							&\longmapsto			&y\\
+\end{array}$ 
+	cet homomorphisme.
+	Comme $\varphi'(P)=0$, $\exists\psi '\ :\ \mathbb{F}_{p}[X]/(P)\ \longrightarrow K'$ telle que $\varphi =\psi'\pi\circ\psi'$ est injective, donc c'est un isomorphisme car $\mathbb{F}_{p}[X]/(P)$ et $K'$ ont $q$ éléments.
+	Finalement, on a que $\psi'\psi^{-1}$ est un isomorphisme de $K$ sur $K'$.
+	\end{proof}

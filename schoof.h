@@ -19,5 +19,5 @@ typedef Element*  List;
 
 
 // Déclaration de fonction
-void division_polynomial(fq_poly_t fk, fq_poly_t ecc, fq_poly_t frob, fq_poly_t f1, fq_poly_t f2, fq_poly_t f3, fq_poly_t f4, fmpz_t k, fq_ctx_t fq);
+void division_polynomial(fq_poly_t fk, fq_poly_t f1, fq_poly_t f2, fq_poly_t f3, fq_poly_t f4, fq_poly_t f5, fmpz_t k, fq_ctx_t fq);
 void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq);

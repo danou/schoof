@@ -1,0 +1,238 @@
+\documentclass[fleqn,leqno]{article}% option leqno pour aligner les numéros d'équations à gauche
+                                    % option fleqn pour aligne les équations à gauche
+
+\usepackage[utf8]{inputenc}%          encodage en utf8 du fichier soruce
+\usepackage[T1]{fontenc}%             encodage de police pour gérer les accents français
+\usepackage[francais]{babel}%         documen en langue française uniquement
+\usepackage{textcomp}%                caractères additionnels
+\usepackage{amsmath,amssymb,amsthm}%  packages de l'AMS
+\usepackage{txfonts}%                 pour utilsier la police times
+\usepackage[a4paper]{geometry}%       pour gérer la taille du papier et les marges
+\usepackage{graphicx}%                pour inclure des images
+\usepackage{xcolor}%                  pour gérer les couleurs
+\usepackage{microtype}%               diverses améliorations typographiques
+
+\usepackage{wrapfig}%                 pour mettre des images dans le texte
+
+\usepackage{titling}%                 pour personnaliser le titre
+\usepackage[runin]{abstract}%         pour personnaliser l'abstract ; l'option runin ne met pas le titre au-dessus
+\usepackage{titlesec}%                pour personnaliser les sections
+\usepackage{titletoc}%                pour personnaliser la table des matières
+\usepackage{fancyhdr}%                pour personnaliser les en-têtes et pieds de pages
+\usepackage{footmisc}%                pour personnaliser les footnotes
+
+\usepackage{hyperref}%                gestion des hyperliens --> À METTRE EN DERNIER
+\hypersetup{pdfstartview=XYZ}%        restauration du zoom par défaut
+
+
+% PERSONNALISATION DE LA PAGE
+% taille de papier
+\geometry{papersize={14cm,16cm}}
+% marges
+\geometry{top=2cm,bottom=2.5cm}
+
+
+% PERSONNALISATION DU TITRE AVEC TITLING
+% au-dessus du titre
+\setlength{\droptitle}{-1cm}
+\renewcommand{\maketitlehooka}{{\setlength{\parindent}{0cm}\scriptsize
+  \emph{Master 2 Algèbre Appliquées} \hfill
+
+  Université Paris-Saclay \hfill Reproduction interdite
+  
+  2016 - 2017 \hfill Tous droits réservés
+  
+  \vspace{1cm}
+}}
+% titre
+\pretitle{\begin{center}\large\bfseries\MakeUppercase}
+\posttitle{\par\rule{5cm}{0.56pt}\end{center}}
+% auteur
+\preauthor{\begin{center}
+  \textit{par} \scshape \lineskip 0.5em%
+}
+\postauthor{\par\end{center}}
+\renewcommand{\and}{\unskip, }% parce qu'on a supprimé le tableau
+% date
+\predate{\begin{center}\small le }
+%\postdate{\par\end{center}\vspace{1cm}}
+
+
+% PERSONNALISATION DU RÉSUMÉ AVEC LE PACKAGE ABSTRACT
+\renewcommand{\abstractnamefont}{\normalfont\small\scshape}
+\abslabeldelim{. ---}
+\setlength{\absleftindent}{\parindent}
+\setlength{\absrightindent}{\parindent}
+\setlength{\abstitleskip}{-\parindent}
+
+
+% PERSONNALISATION DES THÉORÈMES
+% théorèmes
+\newtheoremstyle{plain}
+  {\topsep}%   espacement avant le théorème
+  {\topsep}%   espacement après le théorème
+  {\itshape}%  police du corps du théorème
+  {}%          indentation (vide pour aucune indentation, sinon \parindent ou une autre longueur)
+  {\scshape}%  police du titre du théorème  
+  {. ---}%     ponctuation après le titre du théorème
+  { }%         espace après le titre du théorème (soit une espace, soit une longueur soit un \newline)
+  {\llap{}\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont(#3)}}% spécification du titre
+\theoremstyle{plain}
+\newtheorem{theoreme}{Théorème}[section]
+\renewcommand{\thetheoreme}{\thesection.\textsc{\roman{theoreme}}}
+
+% définition
+\newtheoremstyle{definition}
+  {\topsep}%   espacement avant la définition
+  {\topsep}%   espacement après la défintion
+  {\itshape}%  police du corps du théorème
+  {}%          indentation (vide pour aucune indentation, sinon \parindent ou une autre longueur)
+  {\scshape}%  police du titre du théorème  
+  {. ---}%     ponctuation après le titre du théorème
+  { }%         espace après le titre du théorème (soit une espace, soit une longueur soit un \newline)
+  {\llap{}\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont(#3)}}% spécification du titre
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}[section]
+\renewcommand{\thedefinition}{\thesection.\textsc{\roman{definition}}}
+
+% remarque
+\newtheoremstyle{remark}
+  {\topsep}%   space before
+  {\topsep}%   space after
+  {}%  Body font
+  {}%          Indent amount (empty for no indent, \parindent)
+  {\itshape}% Thm head font   
+  {. ---}%         Punctuation after thm head
+  { }%         Space after thm head (\newline = linebreak)
+  {\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont(#3)}}% Thm head spec
+\theoremstyle{remark}
+\newtheorem*{remarque}{Remarque}
+
+
+% PERSONNALISATION DES SECTIONS AVEC LE PACKAGE TITLESEC
+\renewcommand{\thesection}{\oldstylenums{\arabic{section}}}
+\titleformat{\section}[hang]
+  {\normalfont\large\bfseries\scshape}
+  {§~\thesection.~}
+  {0em}
+  {}
+
+
+% PERSONNALISATION DE LA TABLE DES MATIÈRES AVEC LE PACKAGE TITLETOC
+\addto\captionsfrench{\renewcommand{\contentsname}{Sommaire}}
+\contentsmargin{2em}% il faut augmenter la largeur de \contentspage car les numéros de pages ont 3 chiffres
+\titlecontents{section}
+  [0pc]
+  {}
+  {§~\thecontentslabel.~}
+  {}
+  {\titlerule*[0.75em]{.}\contentspage}
+
+
+% PERSONNALISATION DES NUMÉROS DE PAGE
+%\setcounter{page}{356}
+
+
+% PERSONNALISATION DES EN-TÊTES AVEC LE PACKAGE FANCYHDR
+\pagestyle{fancy}
+\fancyhead{}
+\makeatletter
+\fancyhead[R]{\itshape\@title}
+\makeatother
+%\fancyhead[L]{\scshape\theauthor}
+\renewcommand{\headrulewidth}{0pt}
+
+
+% PERSONNALISATION DES NUMÉROS D'ÉQUATION
+\numberwithin{equation}{section}
+\renewcommand{\theequation}{\thesection.\textit{\alph{equation}}}
+
+
+% PERSONNALISATION DES FOOTNOTE AVEC LE PACKAGE FOOTMISC
+% numérotation en \fnsymbol des footnotes
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+% utilisation de footmisc pour redéfinir \fnsymbol
+\DefineFNsymbols*{daggers}{%
+  {\textdagger}%
+  {\textdaggerdbl}%
+  {\textdagger\textdagger}%
+  {\textdaggerdbl\textdaggerdbl}%
+  {\textdagger\textdagger\textdagger}%
+  {\textdaggerdbl\textdaggerdbl\textdaggerdbl}%
+  {\textdagger\textdagger\textdagger\textdagger}%
+  {\textdaggerdbl\textdaggerdbl\textdaggerdbl\textdaggerdbl}%
+}
+\setfnsymbol{daggers}
+% désactivation de babel pour l'apparence de la footnote en bas de la page
+\frenchbsetup{FrenchFootnotes=false}
+
+
+% TITRE DU DOCUMENT
+\title{Comptage de points de courbes elliptique sur des corps finis}
+\author{Daniel RESENDE}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Il s'agit de la description de l'algorithme de René Schoof. Celui-ci fût le premier algorithme de comptage de points de courbes elliptique sur des corps finis en un temps polynomial ($O(\log^{9} p)$).  
+\end{abstract}
+
+\begin{remarque}
+Les éléments biographiques sont tirés de \cite{Wikipedia.Euler}.
+\end{remarque}
+
+\tableofcontents
+
+\clearpage\addcontentsline{toc}{section}{Introduction}
+\section*{Introduction}
+
+Dans ce projet, je vais vous présenter un algorithme de comptage de points de courbes elliptique sur des corps finis. Je me restreindrais à des corps finis $\mathbf{F}_{p}$ avec $p$ premier différent de 2 et 3. Pour c'est deux derniers cas, l'algorithme est sensiblement le même. 
+
+\section{Contexte historique}
+
+%\begin{wrapfigure}{r}{0cm}\includegraphics[width=3cm]{200px-Leonhard_Euler_2}\end{wrapfigure}%
+
+
+\section{Courbes elliptiques sur $\mathbf{F}_{p}$}
+Soit $\mathbf{F}_{p}$ un corps fini à $p$ éléments de caractéristiques $p\neq 2,3$.
+
+Soit $E$ une courbe elliptique définie sur $\mathbf{F}_{p}$. On obtient l'équation affine de Weierstra\ss : $$y^{2} = x^{3} + ax + b$$ avec $a,b\in\mathbf{F}_{p}$ et $\Delta = -16(4a^{3} + 27b^{2}) \neq 0$.
+
+\begin{definition}
+Soit $\varPhi$ l'endomorphisme de Frobénius d'une courbe elliptique $E$ tel que  
+$$\begin{array}{clcl}
+\varPhi : &E(\bar{\mathbf{F}_{p}}) &\longrightarrow &E(\bar{\mathbf{F}_{p}})\\
+&(x, y) &\longmapsto	&(x^{p}, y^{p}).\\
+\end{array}$$
+\end{definition}
+
+%& e^{i\pi} = -1 & \text{(voir \cite{Wells.beautiful})}\\
+%& \sum_{n=1}^\infty \frac{1}{n^2} = \lim_{n \to \infty}\left(\frac{1}{1^2} + \frac{1}{2^2} + \frac{1}{3^2} + \cdots + \frac{1}{n^2}\right) = \frac{\pi ^2}{6} & \text{(voir \cite{Wanner.history})} \\
+%& 1 + \frac{1}{2} + \dots + \frac{1}{n} \underset{n\to+\infty}{=} \ln n + %\gamma + O\mathopen{}\left(\frac{1}{n}\right) \\
+%& S - A + F = 2
+
+\section{Quelques résultats mathématiques marquants}
+
+Une des réussites d'Euler a été la démonstration du grand théorème de Fermat dans un cas particulier\footnote{Fermat lui-même n'avait de démonstration que dans le cas $n=4$.}.
+
+\begin{theoreme}[de Fermat, cas $n=3$]\label{theoreme.I}
+L'équation $x^3 + y^3 + z^3 = 0$ n'admet aucune solutions entières lorsque $xyz \neq 0$.
+\end{theoreme}
+
+\begin{proof}
+On renvoie à \cite[p.~134]{Hardy.Wright}.
+\end{proof}
+
+Le théorème~\ref{theoreme.I} est un résultat de théorie des nombres, mais Euler a touché à d'autres domaines. Citons par exemple ce résultat de topologie.
+
+\begin{theoreme}
+Il n'est pas possible de traverser tous les ponts de Könisberg en ne passant qu'une seule fois sur chaque pont.
+\end{theoreme}
+
+%\bibliographystyle{smfalpha}
+%\bibliography{dm2}
+
+\end{document}
