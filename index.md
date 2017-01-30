@@ -1,33 +1,12 @@
 ---
+title: 
+  Schoof's algorithm
 addons:
   style_goodies: yes
 ---
 
 # {{ site.title }}
 
-{{ site.title }} is a [Jekyll](http://jekyllrb.com/) template
-specially made to support teaching. Its goal is to provide a full
-fledged, highly customizable,
-[*Learning Management System*](https://en.wikipedia.org/wiki/Learning_management_system)
-from a static web host such as
-[GitHub Pages](https://pages.github.com/). Its powerful *add-on*
-system enables all the features for which static hosting is not
-enough.
-
-## Get started writing your own course now!
-
-Create a new file, say `article.md`, with the following content
-
-~~~
----
-layout: article
-title: My first article!
----
-
-I <3 eLeMentS!
-~~~
-
-Then run Jekyll and visit <{{ 'article' | absolute_url }}>.
 
 
 ## What next?
