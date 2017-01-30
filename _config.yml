@@ -2,7 +2,7 @@
 permalink: pretty
 
 # About
-title: eLeMentS
+title: Test
 tagline: A Jekyll-based DIY Learning Management System
 authors:
   - name: the eLeMentS team
@@ -28,10 +28,10 @@ defaults:
       layout: default
       addons:
         favicon: yes
-#        mathjax: yes
-#        highlightjs: yes
-#        print-link: yes
-#        about: yes
+        mathjax: yes
+        highlightjs: yes
+        print-link: yes
+        about: yes
 
 # New page / post / etc. menu
 #create:
