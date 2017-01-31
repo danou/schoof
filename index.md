@@ -5,6 +5,6 @@ addons:
   style_goodies: yes
 ---
 
-# {{ site.title }}
+# {{ site.title }} :
 
-## {{ site.rapport}}
+## [Pre-print](rapport)
