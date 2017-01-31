@@ -7,4 +7,4 @@ addons:
 
 # {{ site.title }} :
 
-## [Pre-print](schoof/preprint)
+## [Pre-print](preprint)
