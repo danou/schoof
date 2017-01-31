@@ -70,3 +70,5 @@ kramdown:
 sass:
   sass_dir: assets/css
   style: compressed
+
+theme: jekyll-theme-cayman
