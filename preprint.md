@@ -11,7 +11,7 @@ Dans ce projet, je vais vous présenter un algorithme de comptage de points de c
 
 Soit $$\mathbf{F}_{p}$$ un corps fini à $$p$$ éléments de caractéristiques $$p\neq 2,3$$.
 
-Soit $$E$$ une courbe elliptique définie sur $$\mathbf{F}_{p}$$. On obtient l'équation affine de Weierstra\ss : $$y^{2} = x^{3} + ax + b$$ avec $$a,b\in\mathbf{F}_{p}$$ et $$\Delta = -16(4a^{3} + 27b^{2}) \neq 0$$.
+Soit $$E$$ une courbe elliptique définie sur $$\mathbf{F}_{p}$$. On obtient l'équation affine de Weierstrass : $$y^{2} = x^{3} + ax + b$$ avec $$a,b\in\mathbf{F}_{p}$$ et $$\Delta = -16(4a^{3} + 27b^{2}) \neq 0$$.
 
 1. Definition
 
