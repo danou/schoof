@@ -15,33 +15,32 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 {
 
     // Déclaration :
-    fmpz_t M, l, trace, sqrt, tmp, k, tho;
+    ulong lmax, i, k, l, tho;
+    mpz_t lmax_mpz, M_mpz, sqrt_mpz;
+    fmpz_t M, l_fmpz, trace, sqrt, tmp, k_fmpz, tho_fmpz;
     fq_t tmp_fq, tmp1_fq, one; // constantes temporaires;
     fq_poly_t ecc; // ecc = X³ + aX + b
     fq_poly_t gcd_poly; // pgcd
     fq_poly_t frob; // frob = X^q - X
     fq_poly_t frob2; // frob2 = X^q² - X
     fq_poly_t tmp_poly;
-    fq_poly_t f0, f1, f2, f3, f4, f5, fk, fl;
+    fq_poly_t fk, fl;
+    fq_poly_t lambda;
+    fq_poly_t* tab = NULL;
 
-    /*
-     * 
-     * 
-     * FILE* data = NULL;
-    data = fopen("test.txt", "wr");
-    *
-    *
-    *
-    */
+    // Initialisation :
+    mpz_init(sqrt_mpz);
+    mpz_init_set_ui(M_mpz, 2);
+    mpz_init_set_ui(lmax_mpz, 3);
 
     // Initialisation :
     fmpz_init(trace);
     fmpz_init(sqrt);
     fmpz_init(tmp);
-    fmpz_init(k);
-    fmpz_init(tho);
+    fmpz_init(k_fmpz);
+    fmpz_init(tho_fmpz);
     fmpz_init_set_ui(M, 2); 
-    fmpz_init_set_ui(l, 3);
+    fmpz_init_set_ui(l_fmpz, 3);
     fmpz_sqrt(sqrt, q);
     fmpz_mul_ui(sqrt, sqrt, 4);
 
@@ -56,14 +55,9 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fq_poly_init(frob, fq);
     fq_poly_init(frob2, fq);
     fq_poly_init(tmp_poly, fq);
-    fq_poly_init(f0, fq);
-    fq_poly_init(f1, fq);
-    fq_poly_init(f2, fq);
-    fq_poly_init(f3, fq);
-    fq_poly_init(f4, fq);
-    fq_poly_init(f5, fq);
     fq_poly_init(fk, fq);
     fq_poly_init(fl, fq);
+    fq_poly_init(lambda, fq);
 
     // Initialisation de l'équation de la courbe elliptique
     fq_poly_set_fq(ecc, b, fq); 
@@ -80,73 +74,35 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fq_neg(tmp_fq, tmp_fq, fq); // tmp_fq = -1
     fq_poly_set_coeff(frob, 1, tmp_fq, fq);
 
-    // Initialisation de f0
-    fq_poly_zero(f0, fq); // f0 = 0
-    fq_poly_one(f1, fq);
-    fq_set_ui(tmp_fq, 2, fq); 
-    fq_poly_set_fq(f2, tmp_fq, fq); // tmp_fq = 2 et f2 = 2
+    //Initialisation de lmax pour initialiser le tableau
+    gmp_printf("M %Zd\n", M_mpz);
+    gmp_printf("lmax %Zd\n", lmax_mpz);
+    while(mpz_cmp(M_mpz, sqrt_mpz) < 0)
+    {
+        mpz_mul(M_mpz, M_mpz, lmax_mpz);
+        gmp_printf("M %Zd\n", M_mpz);
+        mpz_nextprime(lmax_mpz, lmax_mpz);
+        gmp_printf("lmax %Zd\n", lmax_mpz);
+    }
+    lmax = 7;//mpz_get_ui(lmax_mpz);
 
-    // Initialisation de f3
-    fq_set_ui(tmp_fq, 3, fq); // tmp_fq = 3
-    fq_poly_set_coeff(f3, 4, tmp_fq, fq);
-    fq_mul_ui(tmp_fq, a, 6, fq); // tmp_fq = 6a
-    fq_poly_set_coeff(f3, 2, tmp_fq, fq);
-    fq_mul_ui(tmp_fq, b, 12, fq); // tmp_fq = 12b
-    fq_poly_set_coeff(f3, 1, tmp_fq, fq);
-    fq_mul(tmp_fq, a, a, fq); // tmp_fq = a²
-    fq_poly_set_coeff(f3, 0, tmp_fq, fq);
+    printf("lmax %lu\n", lmax);
 
-    // Initialisation de f4
-    fq_mul(tmp_fq, tmp_fq, a, fq); // tmp_fq = a³
-    fq_mul(tmp1_fq, b, b, fq); // tmp1_fq = b²
-    fq_mul_ui(tmp1_fq, tmp1_fq, 8, fq); // tmp1_fq = 8b²
-    fq_add(tmp_fq, tmp_fq, tmp1_fq, fq); // tmp_fq = a³+8b²
-    fq_mul_ui(tmp_fq, tmp_fq, 4, fq); // tmp_fq = 4(a³+8b²)
-    fq_neg(tmp_fq, tmp_fq,fq); // tmp_fq = -4(a³+8b²)
-    fq_poly_set_coeff(f4, 0, tmp_fq, fq);
-    fq_mul(tmp_fq, a, b, fq); // tmp_fq = // tmp_fq = ab
-    fq_mul_ui(tmp_fq, tmp_fq, 16,fq); // tmp_fq = 16ab
-    fq_neg(tmp_fq, tmp_fq, fq); // tmp_fq = -16ab
-    fq_poly_set_coeff(f4, 1, tmp_fq, fq);
-    fq_mul(tmp_fq, a, a, fq); // tmp_fq = a²
-    fq_mul_ui(tmp_fq, tmp_fq, 20, fq); // tmp_fq = 20a²
-    fq_neg(tmp_fq, tmp_fq, fq); // tmp_fq = -20a²
-    fq_poly_set_coeff(f4, 2, tmp_fq, fq); 
-    fq_mul_ui(tmp_fq, b, 80, fq); // tmp_fq = 80b
-    fq_poly_set_coeff(f4, 3, tmp_fq, fq);
-    fq_mul_ui(tmp_fq, a, 20, fq); // tmp_fq = 20a
-    fq_poly_set_coeff(f4, 4, tmp_fq, fq);
-    fq_set_ui(tmp_fq, 4, fq); // tmp_fq = 4
-    fq_poly_set_coeff(f4, 6, tmp_fq, fq); 
+    // Construction du tableau de polynôme de division
+    tab = malloc((lmax +1 ) * sizeof(fq_poly_t));
+    if(tab == NULL)
+    {
+        fprintf(stderr, "You need more memory.\n"); exit(EXIT_FAILURE);
+    }
+    for(i = 0; i <= lmax; i++) fq_poly_init(tab[i], fq);
+    printf("lmax %lu", lmax);
 
-    // Initialisation de f5
-    fq_poly_pow(f5, f2, 3, fq);
-    fq_poly_mul(f5, f5, f4, fq);
-    fq_poly_sqr(tmp_poly, ecc, fq);
-    fq_poly_mul(f5, f5, tmp_poly, fq); // c'est la réduction et élimination des y dans le polynôme de division
-    fq_poly_pow(tmp_poly, f3, 3, fq);
-    fq_poly_mul(tmp_poly, tmp_poly, f1, fq);
-    fq_poly_sub(f5, f5, tmp_poly, fq);
+    // Remplissage du tableau
+    printf("polynôme de division\n");
+    division_polynomial(tab, a, b, ecc, lmax, fq);
 
-    fq_poly_print_pretty(f5, "X", fq); 
+    //for(i = 0; i <= lmax ; i++) { printf("%lu : ", i) ; fq_poly_print_pretty(tab[i], "X", fq) ; printf("\n"); }
 
-    /*
-     * 
-     * 
-     * 
-    //fq_poly_fprint(data, f0, fq);
-    //fq_poly_fprint(data, f1, fq);
-    //fq_poly_fprint(data, f2, fq);
-    //fq_poly_fprint(data, f3, fq);
-    //fq_poly_fprint(data, f4, fq);
-     *
-    fq_poly_fprint_pretty(data, f3, "X", fq);
-     *
-     *
-    fclose(data);
-    exit(-1);
-    *
-    */
 
     // Cas l = 2 :
     fq_poly_gcd(gcd_poly, frob, ecc, fq);
@@ -156,9 +112,10 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     // Cas général :
     while(fmpz_cmp(M, sqrt) < 0)
     {
-        //printf("Une boucle while\n");
+        fmpz_mod(k_fmpz, q, l_fmpz); // k = q [l]
 
-        fmpz_mod(k, q, l); // k = q [l]
+        k = fmpz_get_ui(k_fmpz);
+        l = fmpz_get_ui(l_fmpz);
 
         /*
          *
@@ -167,101 +124,68 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
          */
 
         // Pré-calculs des polynôme pour le pgcd
-        if(fmpz_is_even(k))
+        if(k & 0x1)
         {
-            division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-            fq_poly_sqr(gcd_poly, fk, fq);
+            // Cas k impair
+            fq_poly_sqr(gcd_poly, tab[k], fq);
             fq_poly_mul(gcd_poly, gcd_poly, frob2, fq);
-            fq_poly_mul(gcd_poly, gcd_poly, ecc, fq);
-
-            fmpz_sub_ui(k, k, 1); // k-1
-
-            division_polynomial(tmp_poly, f1, f2, f3, f4, f5, k, fq);
-
-            fmpz_add_ui(k, k, 2); // k+1
-
-            division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-            fq_poly_mul(tmp_poly, tmp_poly, fk, fq);
+            fq_poly_mul(tmp_poly, tab[k - 1], tab[k + 1], fq);
+            fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);
             fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
         }
         else
         {
-            division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-            fq_poly_sqr(gcd_poly, fk, fq);
+            // Cas k pair
+            fq_poly_sqr(gcd_poly, tab[k], fq);
             fq_poly_mul(gcd_poly, gcd_poly, frob2, fq);
-
-            fmpz_sub_ui(k, k, 1); // k-1
-
-            division_polynomial(tmp_poly, f1, f2, f3, f4, f5, k, fq);
-
-            fmpz_add_ui(k, k, 2); // k+1
-
-            division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-            fq_poly_mul(tmp_poly, tmp_poly, fk, fq);
-            fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);
+            fq_poly_mul(gcd_poly, gcd_poly, ecc, fq);
+            fq_poly_mul(tmp_poly, tab[k - 1], tab[k + 1], fq);
             fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
         }
 
-        division_polynomial(fl, f1, f2, f3, f4, f5, l, fq);
-
         // Test du pgcd
-        fq_poly_gcd(gcd_poly, gcd_poly, fl, fq);
+        fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
         if(!fq_poly_is_one(gcd_poly, fq))
         {
             // Test de q carré modulo l
-            if(fmpz_jacobi(q, l) == -1)
+            if(fmpz_jacobi(q, l_fmpz) == -1)
             {
                 fmpz_zero(tmp); // tmp = 0
-                fmpz_CRT(trace, trace, M, tmp, l, 0); // On fait le théorème chinois
+                fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0); // On fait le théorème chinois
             }
             else
             {
                 // Calcul de q = w² modulo l
-                fmpz_sqrtmod(k, q, l); // On a mis la variable k à la place w pour libérer de la place
+                fmpz_sqrtmod(k_fmpz, q, l_fmpz); // On a mis la variable k à la place w pour libérer de la place
+                k = fmpz_get_ui(k_fmpz);
 
                 // Pré-calculs des polynôme pour le pgcd
-                if(fmpz_is_even(k)) // On test si w est pair
+                if(k & 0x1) // On test si w est pair
                 {
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_sqr(gcd_poly, fk, fq);
+                    // Cas impair
+                    fq_poly_sqr(gcd_poly, tab[k], fq);
                     fq_poly_mul(gcd_poly, gcd_poly, frob, fq);
-                    fq_poly_mul(gcd_poly, gcd_poly, ecc, fq);
-
-                    fmpz_sub_ui(k, k, 1); // k = w-1
-
-                    division_polynomial(tmp_poly, f1, f2, f3, f4, f5, k, fq);
-
-                    fmpz_add_ui(k, k, 2); // k = w+1
-
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_mul(tmp_poly, tmp_poly, fk, fq);
+                    fq_poly_mul(tmp_poly, tab[k - 1], tab[k + 1], fq);
+                    fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);
                     fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
                 }
                 else
                 {
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_sqr(gcd_poly, fk, fq);
+                    // Cas pair
+                    fq_poly_sqr(gcd_poly, tab[k], fq);
                     fq_poly_mul(gcd_poly, gcd_poly, frob, fq);
-
-                    fmpz_sub_ui(k, k, 1); // k = w-1
-
-                    division_polynomial(tmp_poly, f1, f2, f3, f4, f5, k, fq);
-
-                    fmpz_add_ui(k, k, 2); // k = w+1
-
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_mul(tmp_poly, tmp_poly, fk, fq);
-                    fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);
+                    fq_poly_mul(gcd_poly, gcd_poly, ecc, fq);
+                    fq_poly_mul(tmp_poly, tab[k - 1], tab[k + 1], fq);
                     fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
                 }
 
                 // Test du pgcd
-                fq_poly_gcd(gcd_poly, gcd_poly, fl, fq);
+                fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
                 if(fq_poly_is_one(gcd_poly, fq))
                 {
                     // Cas dans lequel w n'est pas une valeur propre de phi_l
                     fmpz_zero(tmp); // tmp = 0
-                    fmpz_CRT(trace, trace, M, tmp, l, 0); // On fait le théorème chinois
+                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0); // On fait le théorème chinois
                 }
                 else
                 {
@@ -269,52 +193,38 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                     // Pré-calculs des polynôme pour le pgcd
 
-                    fmpz_sub_ui(k, k, 1); // k = w
-                    fmpz_mul_ui(tmp, k, 2); // tmp = 2w
 
-                    if(fmpz_is_even(k)) // On test si w est pair
+                    fmpz_mul_ui(tmp, k_fmpz, 2); // tmp = 2w
+
+
+                    if(k & 0x1) // On test si w est pair
                     {
-                        fq_poly_pow(gcd_poly, ecc, (fmpz_get_si(q) - 1) / 2 , fq); // gcd_poly = (X³+aX+b)^((q-1)/2)
+                        // Cas impair
+                        fq_poly_pow(gcd_poly, ecc, (fmpz_get_si(q) + 3) / 2 , fq); // gcd_poly = (X³+aX+b)^((q+3)/2)                        
                     }
                     else
                     {
-                        fq_poly_pow(gcd_poly, ecc, (fmpz_get_si(q) + 3) / 2 , fq); // gcd_poly = (X³+aX+b)^((q+3)/2)
+                        // Cas pair
+                        fq_poly_pow(gcd_poly, ecc, (fmpz_get_si(q) - 1) / 2 , fq); // gcd_poly = (X³+aX+b)^((q-1)/2)
                     }
 
                     fq_set_ui(tmp_fq, 4, fq); // tmp_fq = 4
                     fq_poly_scalar_mul_fq(gcd_poly, gcd_poly, tmp_fq, fq);
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_pow(tmp_poly, fk, 3, fq);
+                    fq_poly_pow(tmp_poly, tab[k], 3, fq);
                     fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
-
-                    fmpz_add_ui(k, k, 2); // k = w+2
-
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_sqr(tmp_poly, fk, fq);
-
-                    fmpz_sub_ui(k, k, 3); // k = w-1
-
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_mul(tmp_poly, tmp_poly, fk, fq);
+                    fq_poly_sqr(tmp_poly, tab[k + 2], fq);
+                    fq_poly_mul(tmp_poly, tmp_poly, tab[k - 1], fq);
                     fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
-
-                    fmpz_sub_ui(k, k, 1); // k = w-2
-
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_sqr(tmp_poly, fk, fq);
-
-                    fmpz_add_ui(k, k, 3); // k = w+1
-
-                    division_polynomial(fk, f1, f2, f3, f4, f5, k, fq);
-                    fq_poly_mul(tmp_poly, tmp_poly, fk, fq);
+                    fq_poly_sqr(tmp_poly, tab[k - 2], fq);
+                    fq_poly_mul(tmp_poly, tmp_poly, tab[k + 1], fq);
                     fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
 
                     // Test du pgcd
-                    fq_poly_gcd(gcd_poly, gcd_poly, fl, fq);
+                    fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
                     if(fq_poly_is_one(gcd_poly, fq)) fmpz_neg(tmp, tmp); // si pgcd = 1 alors tmp = -2w [l], sinon tmp = 2w [l]
 
                     // On fait le théorème chinois
-                    fmpz_CRT(trace, trace, M, tmp, l, 0);
+                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0);
                 }
             }
         }
@@ -328,20 +238,22 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
         else
         {
             // On teste tous les tho possible tel que 0 < tho < l
-            fmpz_one(tho);
-            while(fmpz_cmp(tho, l) < 0)
+
+            for(tho = 1; tho < l; tho++)
             {
                 
-                // Incrémentation de tho
-                fmpz_add_ui(tho, tho, 1);
+                
+                
+                // if mod égale 0 alors break;
             }
+
         }
 
         // Incrémentation de la boucle
-        fmpz_mul(M, M, l);
-        fmpz_add_ui(l, l, 2);
-        while(fmpz_is_prime(l) != 1) fmpz_add_ui(l, l, 1); // on fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible
-        fmpz_print(l);
+        fmpz_mul(M, M, l_fmpz);
+        fmpz_add_ui(l_fmpz, l_fmpz, 2);
+        while(fmpz_is_prime(l_fmpz) != 1) fmpz_add_ui(l_fmpz, l_fmpz, 1); // on fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible
+        fmpz_print(l_fmpz);
         printf("\n");
     }
 
@@ -351,11 +263,11 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fmpz_sub(card, card, trace);
 
     // Libération de la mémoire :
-    fq_poly_clear(ecc, fq); fq_poly_clear(gcd_poly, fq); fq_poly_clear(frob, fq); fq_poly_clear(tmp_poly, fq);
-    fq_poly_clear(f0, fq); fq_poly_clear(f1, fq); fq_poly_clear(f2, fq); fq_poly_clear(f3, fq); fq_poly_clear(f4, fq);
+    fq_poly_clear(ecc, fq); fq_poly_clear(gcd_poly, fq); fq_poly_clear(frob, fq); fq_poly_clear(tmp_poly, fq); fq_poly_clear(lambda, fq);
     fq_poly_clear(fk, fq); fq_poly_clear(fl, fq);
     fq_clear(tmp_fq, fq); fq_clear(tmp1_fq, fq); fq_clear(one, fq);
-    fmpz_clear(M); fmpz_clear(l); fmpz_clear(sqrt); fmpz_clear(trace); fmpz_clear(tmp); fmpz_clear(k); fmpz_clear(tho);
+    fmpz_clear(M); fmpz_clear(l_fmpz); fmpz_clear(sqrt); fmpz_clear(trace); fmpz_clear(tmp); fmpz_clear(k_fmpz); fmpz_clear(tho_fmpz);
+    mpz_clear(sqrt_mpz); mpz_clear(lmax_mpz); mpz_clear(M_mpz);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -419,7 +331,7 @@ int main(int agrc, char** argv)
     // Libération mémoire
     fq_clear(delta, fq); fq_clear(tmp_fq, fq);
 
-    // Fonction schoof 
+    // Fonction schoof
     schoof(card, A, B, q, fq);
 
     // Affichage du résultat 
