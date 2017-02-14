@@ -7,5 +7,6 @@ addons:
 
 # {{ site.title }} :
 
-## [subject (in french)](http://defeo.lu/MA2-AlgoC/projects/schoof)
+## [Subject (in french)](http://defeo.lu/MA2-AlgoC/projects/schoof)
+
 ## [Pre-print](preprint)
