@@ -12,6 +12,9 @@
 \usepackage{xcolor}%                  pour gérer les couleurs
 \usepackage{microtype}%               diverses améliorations typographiques
 
+\usepackage[Algorithme]{algorithm}
+\usepackage{algorithmic}
+
 \usepackage{wrapfig}%                 pour mettre des images dans le texte
 
 \usepackage{titling}%                 pour personnaliser le titre
@@ -26,10 +29,8 @@
 
 
 % PERSONNALISATION DE LA PAGE
-% taille de papier
-\geometry{papersize={14cm,16cm}}
 % marges
-\geometry{top=2cm,bottom=2.5cm}
+\geometry{top=3cm,bottom=2.5cm}
 
 
 % PERSONNALISATION DU TITRE AVEC TITLING
@@ -120,7 +121,7 @@
 
 % PERSONNALISATION DE LA TABLE DES MATIÈRES AVEC LE PACKAGE TITLETOC
 \addto\captionsfrench{\renewcommand{\contentsname}{Sommaire}}
-\contentsmargin{2em}% il faut augmenter la largeur de \contentspage car les numéros de pages ont 3 chiffres
+%\contentsmargin{2em}% il faut augmenter la largeur de \contentspage car les numéros de pages ont 3 chiffres
 \titlecontents{section}
   [0pc]
   {}
@@ -139,7 +140,7 @@
 \makeatletter
 \fancyhead[R]{\itshape\@title}
 \makeatother
-%\fancyhead[L]{\scshape\theauthor}
+\fancyhead[L]{\scshape\theauthor}
 \renewcommand{\headrulewidth}{0pt}
 
 
@@ -181,7 +182,7 @@ Il s'agit de la description de l'algorithme de René Schoof. Celui-ci fût le pr
 \end{abstract}
 
 \begin{remarque}
-Les éléments biographiques sont tirés de \cite{Wikipedia.Euler}.
+Les éléments biographiques sont tirés de ..
 \end{remarque}
 
 \tableofcontents
@@ -191,12 +192,14 @@ Les éléments biographiques sont tirés de \cite{Wikipedia.Euler}.
 
 Dans ce projet, je vais vous présenter un algorithme de comptage de points de courbes elliptique sur des corps finis. Je me restreindrais à des corps finis $\mathbf{F}_{p}$ avec $p$ premier différent de 2 et 3. Pour c'est deux derniers cas, l'algorithme est sensiblement le même. 
 
-\section{Contexte historique}
+\subsection{Contexte historique}
 
 %\begin{wrapfigure}{r}{0cm}\includegraphics[width=3cm]{200px-Leonhard_Euler_2}\end{wrapfigure}%
 
 
+
 \section{Courbes elliptiques sur $\mathbf{F}_{p}$}
+
 Soit $\mathbf{F}_{p}$ un corps fini à $p$ éléments de caractéristiques $p\neq 2,3$.
 
 Soit $E$ une courbe elliptique définie sur $\mathbf{F}_{p}$. On obtient l'équation affine de Weierstra\ss : $$y^{2} = x^{3} + ax + b$$ avec $a,b\in\mathbf{F}_{p}$ et $\Delta = -16(4a^{3} + 27b^{2}) \neq 0$.
@@ -209,10 +212,44 @@ $$\begin{array}{clcl}
 \end{array}$$
 \end{definition}
 
-%& e^{i\pi} = -1 & \text{(voir \cite{Wells.beautiful})}\\
-%& \sum_{n=1}^\infty \frac{1}{n^2} = \lim_{n \to \infty}\left(\frac{1}{1^2} + \frac{1}{2^2} + \frac{1}{3^2} + \cdots + \frac{1}{n^2}\right) = \frac{\pi ^2}{6} & \text{(voir \cite{Wanner.history})} \\
-%& 1 + \frac{1}{2} + \dots + \frac{1}{n} \underset{n\to+\infty}{=} \ln n + %\gamma + O\mathopen{}\left(\frac{1}{n}\right) \\
-%& S - A + F = 2
+\section{Algorithme de Schoof}
+
+\subsection{Cas général}
+
+\begin{algorithm}
+\caption{Algorithme de Shoof}
+\label{schoof}
+\begin{algorithmic} 
+\REQUIRE Une courbe elliptique $E$ sur $\mathbf{F}_{p}$ un polynôme quelconque.
+\ENSURE Le cardinal de $E(\mathbf{F}_{p})$.
+\STATE $M\leftarrow 2, l\leftarrow 3$;
+\STATE $S\leftarrow \{(t\ mod\ 2, 2)\}$; \COMMENT{Cas pour $l = 2$}
+\WHILE{$M < 4\sqrt{q}$}
+	\STATE $k\leftarrow q\ mod\ l$;	
+	\FOR{$\tau = 0$ \TO $\frac{l - 1}{2}$}
+		\IF{$\forall P\in E[l],\ \varphi^{2}(P) + [k]P = \pm[\tau]\varphi(P)$}
+			\STATE $S\leftarrow S\cup \{(\tau, l)\}$ \OR $S\leftarrow S\cup \{(-\tau, l)\}$ \COMMENT{Selon les cas}
+			\STATE break;
+		\ENDIF
+	\ENDFOR
+	\STATE $M\leftarrow M*l$;
+	\STATE $l\leftarrow\ nextprime(l)$; \COMMENT{Donne le prochain nombre premier après $l$}	
+\ENDWHILE
+\STATE $\forall t\in S,\ trace\leftarrow CRT(t)$; \COMMENT{Effectue le théorème des restes chinois}
+\RETURN $q + 1 - trace$.
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Amélioration de Schoof}
+
+Dans son article original, Schoof (voir \cite{ref1}) propose une amélioration possible de son algorithme.
+\begin{itemize}
+\item Si $\forall P$ nonzéro $\phi_{l}^{2}P = \pm kP$ avec $q\equiv k[l]$ 
+\item Sinon on fait le cas général.
+\end{itemize}
+
+
+
 
 \section{Quelques résultats mathématiques marquants}
 
@@ -223,7 +260,7 @@ L'équation $x^3 + y^3 + z^3 = 0$ n'admet aucune solutions entières lorsque $xy
 \end{theoreme}
 
 \begin{proof}
-On renvoie à \cite[p.~134]{Hardy.Wright}.
+On renvoie à \cite{ref1}
 \end{proof}
 
 Le théorème~\ref{theoreme.I} est un résultat de théorie des nombres, mais Euler a touché à d'autres domaines. Citons par exemple ce résultat de topologie.
@@ -232,7 +269,13 @@ Le théorème~\ref{theoreme.I} est un résultat de théorie des nombres, mais Eu
 Il n'est pas possible de traverser tous les ponts de Könisberg en ne passant qu'une seule fois sur chaque pont.
 \end{theoreme}
 
-%\bibliographystyle{smfalpha}
-%\bibliography{dm2}
+
+ 
+\nocite{*}
+
+ 
+\bibliographystyle{alpha}
+\bibliography{Bibliographie}
+
 
 \end{document}
