@@ -10,3 +10,7 @@ addons:
 ## [Subject (in french)](http://defeo.lu/MA2-AlgoC/projects/schoof)
 
 ## [Pre-print](preprint)
+
+## [PDF](/rapport/rapport)
+
+## [Sources](https://github.com/danou/schoof/)
