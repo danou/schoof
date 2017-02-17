@@ -1,4 +1,4 @@
-\documentclass[fleqn,leqno]{article}% option leqno pour aligner les numéros d'équations à gauche
+\documentclass{article}% option leqno pour aligner les numéros d'équations à gauche
                                     % option fleqn pour aligne les équations à gauche
 
 \usepackage[utf8]{inputenc}%          encodage en utf8 du fichier soruce
@@ -19,7 +19,7 @@
 
 \usepackage{titling}%                 pour personnaliser le titre
 \usepackage[runin]{abstract}%         pour personnaliser l'abstract ; l'option runin ne met pas le titre au-dessus
-\usepackage{titlesec}%                pour personnaliser les sections
+%\usepackage{titlesec}%                pour personnaliser les sections
 \usepackage{titletoc}%                pour personnaliser la table des matières
 \usepackage{fancyhdr}%                pour personnaliser les en-têtes et pieds de pages
 \usepackage{footmisc}%                pour personnaliser les footnotes
@@ -75,26 +75,21 @@
   {\itshape}%  police du corps du théorème
   {}%          indentation (vide pour aucune indentation, sinon \parindent ou une autre longueur)
   {\scshape}%  police du titre du théorème  
-  {. ---}%     ponctuation après le titre du théorème
-  { }%         espace après le titre du théorème (soit une espace, soit une longueur soit un \newline)
+  {}%     ponctuation après le titre du théorème
+  {\newline}%         espace après le titre du théorème (soit une espace, soit une longueur soit un \newline)
   {\llap{}\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont(#3)}}% spécification du titre
 \theoremstyle{plain}
 \newtheorem{theoreme}{Théorème}[section]
 \renewcommand{\thetheoreme}{\thesection.\textsc{\roman{theoreme}}}
 
 % définition
-\newtheoremstyle{definition}
-  {\topsep}%   espacement avant la définition
-  {\topsep}%   espacement après la défintion
-  {\itshape}%  police du corps du théorème
-  {}%          indentation (vide pour aucune indentation, sinon \parindent ou une autre longueur)
-  {\scshape}%  police du titre du théorème  
-  {. ---}%     ponctuation après le titre du théorème
-  { }%         espace après le titre du théorème (soit une espace, soit une longueur soit un \newline)
-  {\llap{}\thmname{#1}\thmnumber{ #2}\thmnote{ \normalfont(#3)}}% spécification du titre
 \theoremstyle{definition}
 \newtheorem{definition}{Définition}[section]
-\renewcommand{\thedefinition}{\thesection.\textsc{\roman{definition}}}
+
+
+% proposition
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}[section]
 
 % remarque
 \newtheoremstyle{remark}
@@ -110,19 +105,19 @@
 \newtheorem*{remarque}{Remarque}
 
 
-% PERSONNALISATION DES SECTIONS AVEC LE PACKAGE TITLESEC
-\renewcommand{\thesection}{\oldstylenums{\arabic{section}}}
-\titleformat{\section}[hang]
-  {\normalfont\large\bfseries\scshape}
-  {§~\thesection.~}
-  {0em}
-  {}
+
 
 
 % PERSONNALISATION DE LA TABLE DES MATIÈRES AVEC LE PACKAGE TITLETOC
 \addto\captionsfrench{\renewcommand{\contentsname}{Sommaire}}
 %\contentsmargin{2em}% il faut augmenter la largeur de \contentspage car les numéros de pages ont 3 chiffres
 \titlecontents{section}
+  [0pc]
+  {}
+  {§~\thecontentslabel.~}
+  {}
+  {\titlerule*[0.75em]{.}\contentspage}
+ \titlecontents{subsection}
   [0pc]
   {}
   {§~\thecontentslabel.~}
@@ -145,8 +140,8 @@
 
 
 % PERSONNALISATION DES NUMÉROS D'ÉQUATION
-\numberwithin{equation}{section}
-\renewcommand{\theequation}{\thesection.\textit{\alph{equation}}}
+%\numberwithin{equation}{section}
+%\renewcommand{\theequation}{\thesection.\textit{\alph{equation}}}
 
 
 % PERSONNALISATION DES FOOTNOTE AVEC LE PACKAGE FOOTMISC
@@ -173,6 +168,9 @@
 \author{Daniel RESENDE}
 \date{\today}
 
+\newcommand\fq{\mathbf{F}_{q}}
+\newcommand\ie{\textit{i.e.}}
+
 \begin{document}
 
 \maketitle
@@ -181,64 +179,187 @@
 Il s'agit de la description de l'algorithme de René Schoof. Celui-ci fût le premier algorithme de comptage de points de courbes elliptique sur des corps finis en un temps polynomial ($O(\log^{9} p)$).  
 \end{abstract}
 
-\begin{remarque}
-Les éléments biographiques sont tirés de ..
-\end{remarque}
-
 \tableofcontents
 
 \clearpage\addcontentsline{toc}{section}{Introduction}
 \section*{Introduction}
 
-Dans ce projet, je vais vous présenter un algorithme de comptage de points de courbes elliptique sur des corps finis. Je me restreindrais à des corps finis $\mathbf{F}_{p}$ avec $p$ premier différent de 2 et 3. Pour c'est deux derniers cas, l'algorithme est sensiblement le même. 
+\begin{wrapfigure}{r}{0cm}
+\includegraphics[width=3cm]{Rene_Schoof.jpg}
+\caption{\label{étiquette}Portrait René Schoof}
+\end{wrapfigure}
+Les courbes elliptiques définissent une lois de groupe sur les corps finis $\fq$ qui est difficile pour le problème du logarithme discret. On retrouve par conséquent son utilisation dans plusieurs schémas cryptographiques comme Diffie-Hellman (avec ECDH) ou El-Gamal (avec ECDSA).
+Cependant, l'utilisation de schémas à l'aide de courbes elliptiques nécessite d'avoir un grand nombre premier qui divise l'ordre d'un sous-groupe cyclique de la courbe de $E(\fq)$. Nous avons donc besoin de connaitre le cardinal de $E(\fq)$.
 
-\subsection{Contexte historique}
+\begin{list}{•}{Il existe aujourd'hui de nombres algorithme de comptage de points d'une courbes elliptiques sur un corps finis $\fq$ :}
+\item L'algorithme Baby Step Giant Step basé sur le théorème de Hasse,
+\item L'algorithme Schoof en 1985 que l'on va étudier dans ce mémoire,
+\item L'algorithme SEA [Schoof, Elkies, Atkin] en 1995 qui est une amélioration de l'algorithme de Schoof,
+\item L'algorithme de Satoh en 2005 basé sur le relèvement canonique sur les $\mathbf{Z}$ $q$-adiques,
+\item L'algorithme AGM [Mestre] basé sur le calcul de suites arithmetico-géométriques.
+\end{list}
 
-%\begin{wrapfigure}{r}{0cm}\includegraphics[width=3cm]{200px-Leonhard_Euler_2}\end{wrapfigure}%
+Dans ce projet, je vais vous présenter un algorithme de comptage de points de courbes elliptique sur des corps finis. Je me restreindrais à des corps finis $\fq$ avec $q=p^{n}$ et $p$ premier différent de 2 et 3. Pour c'est deux derniers cas, l'algorithme est sensiblement le même. 
 
+%\clearpage
+\section{Courbes elliptiques sur $\fq$}
 
+Soit $\fq$ un corps fini à $p$ éléments de caractéristiques $p\neq 2,3$.
 
-\section{Courbes elliptiques sur $\mathbf{F}_{p}$}
-
-Soit $\mathbf{F}_{p}$ un corps fini à $p$ éléments de caractéristiques $p\neq 2,3$.
-
-Soit $E$ une courbe elliptique définie sur $\mathbf{F}_{p}$. On obtient l'équation affine de Weierstra\ss : $$y^{2} = x^{3} + ax + b$$ avec $a,b\in\mathbf{F}_{p}$ et $\Delta = -16(4a^{3} + 27b^{2}) \neq 0$.
+Soit $E$ une courbe elliptique définie sur $\fq$. On obtient l'équation affine de Weierstra\ss : 
+\begin{equation}
+y^{2} = x^{3} + ax + b
+\end{equation} 
+avec $a,b\in\fq$ et $\Delta = -16(4a^{3} + 27b^{2}) \neq 0$.
 
 \begin{definition}
 Soit $\varPhi$ l'endomorphisme de Frobénius d'une courbe elliptique $E$ tel que  
 $$\begin{array}{clcl}
-\varPhi : &E(\bar{\mathbf{F}_{p}}) &\longrightarrow &E(\bar{\mathbf{F}_{p}})\\
+\varPhi : &E(\bar{\fq}) &\longrightarrow &E(\bar{\fq})\\
 &(x, y) &\longmapsto	&(x^{p}, y^{p}).\\
 \end{array}$$
 \end{definition}
 
-\section{Algorithme de Schoof}
+\begin{definition}[Trace]
+Soit $E$ une courbe elliptique sur $\fq$. La trace de $E(\fq)$ est l'entier $t=q+1-\#E(\fq)$.
+\end{definition}
 
+\begin{proposition}
+Soit la trace $t$ de $E(\fq)$, on a alors 
+\begin{equation}
+\phi^{2} - t\phi + q = 0
+\end{equation}
+\end{proposition}
+
+\begin{theoreme}[de Hasse]
+Soit $E$ une courbe elliptique sur $\fq$ et la trace $t$ de $E(\fq)$.
+On a \begin{equation}
+\mid t\mid\leq 2\sqrt{q},
+\end{equation}
+et par conséquent
+\begin{equation}
+\mid\#E(\fq)-(q+1)\mid\leq 2\sqrt{q}
+\end{equation}
+\end{theoreme}
+
+Nous allons maintenant nous concentrer sur les sous-groupe de $n$-torsions $E[n]$ avec $n\in\mathbf{Z}_{\geq -1}$ tel que $p\nshortmid n$. Et on introduit la notion de polynôme de division.
+
+\begin{definition}[Polynôme de division]
+Soit $n\in\mathbb{Z}^{*}$, le polynôme de division $\psi_{n}$ est la fonction polynôme de $K[E]$ de coefficient dominent $n$ et de diviseur $$div(\psi_{n})=(E[n])-n^{2}(\vartheta)$$
+\end{definition}
+
+\begin{proposition}[Caractérisation du polynôme de division]
+On construit le polynôme de division par récurrence sur $n\in\mathbf{Z}_{\geq 1}$ :
+\begin{enumerate}
+\item $\psi_{-1}(X,Y)=-1,\ \psi_{0}(X,Y)=0,\ \psi_{1}(X,Y)=1,\ \psi_{2}(X,Y)=2Y$,
+\item $\psi_{3}(X,Y)=3X^{4} + 6aX^{2} + 12bX - a^{2}$,
+\item $\psi_{4}(X,Y)=4Y(X^{6} + 5aX^{4} + 20bX^{3} - 5a^{2}X^{2} - 4bX - 8b^{2} - a^{3}$,
+\item $\psi_{2n}(X,Y)=\psi_{n}(\psi_{n+2}\psi_{n-1}^{2} - \psi_{n-2}\psi_{n+1}^{2})/2Y$,
+\item $\psi_{2n+1}(X,Y)=\psi_{n+2}\psi_{n}^{3} - \psi_{n+1}^{3}\psi_{n-1}$,
+\item $\psi_{-n}=\psi_{n}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Voir \cite{ref4}.
+\end{proof}
+
+Dans l'algorithme de Schoof, nous utiliserons une variante du polynôme de division.
+
+\begin{definition}
+Soit $n\in\mathbb{Z}^{*}$, le polynôme $f_{n}$ est une fonction polynôme de $K[E]$ définie par les relations suivantes : 
+$$
+f(n) = \left\{
+\begin{array}{l l}
+  \bar{\psi_{n}}(X,Y) & \quad \text{si } n \text{ est pair}\\
+  \bar{\psi_{n}}(X,Y)/Y & \quad \text{si } n \text{ est impair}\\ \end{array} \right.
+$$
+où $\bar{\psi_{n}}$ est la réduction de $\psi_{n}$ par les termes en $Y^{2}$ par l'équation $(E)$.
+\end{definition}
+
+\begin{proposition}[Caractérisation de $f_{n}$]
+On construit $f_{n}$ par récurrence sur $n\in\mathbf{Z}_{\geq 1}$ :
+\begin{enumerate}
+\item $f_{-1}(X)=-1,\ f_{0}(X)=0,\ f_{1}(X)=1,\ f_{2}(X)=2$,
+\item $\psi_{3}(X)=3X^{4} + 6aX^{2} + 12bX - a^{2}$,
+\item $\psi_{4}(X)=4Y(X^{6} + 5aX^{4} + 20bX^{3} - 5a^{2}X^{2} - 4bX - 8b^{2} - a^{3}$,
+\item $f_{2n}(X,Y)=f_{n}(f_{n+2}f_{n-1}^{2} - f_{n-2}f_{n+1}^{2})$,
+
+\item $$
+f(n) = \left\{ 
+\begin{array}{l l}
+  \bar{\psi_{n}}(X,Y) & \quad \text{si } n \text{ est pair}\\
+  \bar{\psi_{n}}(X,Y)/Y & \quad \text{si } n \text{ est impair}\\ \end{array} \right.
+$$
+
+
+\item $f_{2n+1}(X,Y)=\psi_{n+2}\psi_{n}^{3} - \psi_{n+1}^{3}\psi_{n-1}$,
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Voir \cite{ref4}.
+\end{proof}
+
+
+
+
+
+
+\clearpage
+\section{Algorithme de Schoof}
 \subsection{Cas général}
+
+Cette algorithme consiste à calculer la trace du frobénius modulo tous les $l<l_{max}$ tel que $l_{max}$ soit le plus grand nombre premier vérifiant :\begin{equation} 
+\prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l > 4\sqrt{q}.
+\end{equation}
+Une fois calculé la trace modulo toutes les $l$-torsions, on utilise le Théorème des Restes Chinois (CRT) pour obtenir la trace dans $\fq$. Puis on utilise le théoreme de Hasse pour avoir le cardinal de la courbe $E$ sur $\fq$.
+
+\begin{theoreme}[Algorithme de Schoof]
+Voici le descriptif de l’algorithme de Schoof:
 
 \begin{algorithm}
 \caption{Algorithme de Shoof}
-\label{schoof}
+\label{schoof1}
 \begin{algorithmic} 
-\REQUIRE Une courbe elliptique $E$ sur $\mathbf{F}_{p}$ un polynôme quelconque.
-\ENSURE Le cardinal de $E(\mathbf{F}_{p})$.
+\REQUIRE Une courbe elliptique $E$ sur $\fq$ un polynôme quelconque.
+\ENSURE Le cardinal de $E(\fq)$.
 \STATE $M\leftarrow 2, l\leftarrow 3$;
 \STATE $S\leftarrow \{(t\ mod\ 2, 2)\}$; \COMMENT{Cas pour $l = 2$}
 \WHILE{$M < 4\sqrt{q}$}
-	\STATE $k\leftarrow q\ mod\ l$;	
-	\FOR{$\tau = 0$ \TO $\frac{l - 1}{2}$}
-		\IF{$\forall P\in E[l],\ \varphi^{2}(P) + [k]P = \pm[\tau]\varphi(P)$}
-			\STATE $S\leftarrow S\cup \{(\tau, l)\}$ \OR $S\leftarrow S\cup \{(-\tau, l)\}$ \COMMENT{Selon les cas}
-			\STATE break;
-		\ENDIF
-	\ENDFOR
-	\STATE $M\leftarrow M*l$;
-	\STATE $l\leftarrow\ nextprime(l)$; \COMMENT{Donne le prochain nombre premier après $l$}	
+    \STATE $k\leftarrow q\ mod\ l$;	
+    \FOR{$\tau = 0$ \TO $\frac{l - 1}{2}$}
+        \IF{$\forall P\in E[l],\ \phi^{2}(P) + [k]P = \pm[\tau]\phi(P)$}
+            \STATE $S\leftarrow S\cup \{(\tau, l)\}$ \OR $S\leftarrow S\cup \{(-\tau, l)\}$ \COMMENT{Selon les cas}
+            \STATE break;
+        \ENDIF
+    \ENDFOR
+    \STATE $M\leftarrow M*l$;
+    \STATE $l\leftarrow\ nextprime(l)$; \COMMENT{Donne le prochain nombre premier après $l$}	
 \ENDWHILE
 \STATE $\forall t\in S,\ trace\leftarrow CRT(t)$; \COMMENT{Effectue le théorème des restes chinois}
 \RETURN $q + 1 - trace$.
 \end{algorithmic}
 \end{algorithm}
+\end{theoreme}
+
+\begin{proof}
+\begin{description}
+\item
+\item[Cas mod 2] Dans ce cas, on cherche les points de 2-torsions, \ie les points spéciaux de la courbes.
+$$t=1\ mod\ 2 \Leftrightarrow \#E(\fq)[2] = 1 \Leftrightarrow X^{3} + aX + b\text{ est irreductible sur }\fq\Leftrightarrow pgcd(X^{3} + aX + b, X^{q} - X) = 1$$
+\item 
+\end{description}
+\end{proof}
+
+
+
+
+
+
+
+
+
 
 \subsection{Amélioration de Schoof}
 
@@ -248,34 +369,53 @@ Dans son article original, Schoof (voir \cite{ref1}) propose une amélioration p
 \item Sinon on fait le cas général.
 \end{itemize}
 
+\begin{algorithm}
+\caption{Algorithme de Shoof amélioré}
+\label{schoof2}
+\begin{algorithmic} 
+\REQUIRE Une courbe elliptique $E$ sur $\fq$ un polynôme quelconque.
+\ENSURE Le cardinal de $E(\mathbf{F}_{p})$.
+\STATE $M\leftarrow 2, l\leftarrow 3$;
+\STATE $S\leftarrow \{(t\ mod\ 2, 2)\}$; \COMMENT{Cas pour $l = 2$}
+\WHILE{$M < 4\sqrt{q}$}
+    \STATE $k\leftarrow q\ mod\ l$;	
+    \IF{$\phi_{l}^{2}P = \pm kP$}	
+        \IF{$(\frac{k}{l}) = -1$}
+            \STATE $S\leftarrow S\cup \{(0, l)\}$
+            \ELSE
+                \STATE on recherche $w$ tel que $k=w^{2}\ mod\ l$
+                \IF{$\pm w$ est une valeur propre de $\phi_{l}$}
+                    \STATE $S\leftarrow S\cup \{(w, l)\}$ \OR $S\leftarrow S\cup \{(-w, l)\}$ \COMMENT{Selon les cas}
+                \ELSE
+                    \STATE $S\leftarrow S\cup \{(0, l)\}$
+                \ENDIF
+            \ENDIF
+    \ELSE
+        \FOR{$\tau = 0$ \TO $\frac{l - 1}{2}$}
+            \IF{$\forall P\in E[l],\ \phi^{2}(P) + [k]P = \pm[\tau]\phi(P)$}
+                \STATE $S\leftarrow S\cup \{(\tau, l)\}$ \OR $S\leftarrow S\cup \{(-\tau, l)\}$ \COMMENT{Selon les cas}
+                \STATE break;
+            \ENDIF
+        \ENDFOR
+    \ENDIF
+    \STATE $M\leftarrow M*l$;
+    \STATE $l\leftarrow\ nextprime(l)$; \COMMENT{Donne le prochain nombre premier après $l$}	
+\ENDWHILE
+\STATE $\forall t\in S,\ trace\leftarrow CRT(t)$; \COMMENT{Effectue le théorème des restes chinois}
+\RETURN $q + 1 - trace$.
+\end{algorithmic}
+\end{algorithm}
+
+\clearpage 
+
+\section{Étude de la complexité}
 
 
-
-\section{Quelques résultats mathématiques marquants}
-
-Une des réussites d'Euler a été la démonstration du grand théorème de Fermat dans un cas particulier\footnote{Fermat lui-même n'avait de démonstration que dans le cas $n=4$.}.
-
-\begin{theoreme}[de Fermat, cas $n=3$]\label{theoreme.I}
-L'équation $x^3 + y^3 + z^3 = 0$ n'admet aucune solutions entières lorsque $xyz \neq 0$.
-\end{theoreme}
-
-\begin{proof}
-On renvoie à \cite{ref1}
-\end{proof}
-
-Le théorème~\ref{theoreme.I} est un résultat de théorie des nombres, mais Euler a touché à d'autres domaines. Citons par exemple ce résultat de topologie.
-
-\begin{theoreme}
-Il n'est pas possible de traverser tous les ponts de Könisberg en ne passant qu'une seule fois sur chaque pont.
-\end{theoreme}
 
 
  
-\nocite{*}
-
- 
+\clearpage 
+\nocite{*} 
 \bibliographystyle{alpha}
 \bibliography{Bibliographie}
-
-
 \end{document}
