@@ -11,6 +11,6 @@ addons:
 
 ## [Pre-print](preprint)
 
-## [PDF](/rapport/Rapport.pdf)
+## [PDF](rapport/Rapport)
 
 ## [Sources](https://github.com/danou/schoof/)
