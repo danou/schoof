@@ -14,6 +14,7 @@
 
 \usepackage[Algorithme]{algorithm}
 \usepackage{algorithmic}
+\usepackage{listings}
 
 \usepackage{wrapfig}%                 pour mettre des images dans le texte
 
@@ -37,11 +38,11 @@
 % au-dessus du titre
 \setlength{\droptitle}{-1cm}
 \renewcommand{\maketitlehooka}{{\setlength{\parindent}{0cm}\scriptsize
-  \emph{Master 2 Algèbre Appliquées} \hfill
+  \emph{Master 2 Algèbre Appliquées} \hfill Projet étudiant
 
-  Université Paris-Saclay \hfill Reproduction interdite
+  Université Paris-Saclay \hfill Algorithmique et programmation C
   
-  2016 - 2017 \hfill Tous droits réservés
+  2016 - 2017 \hfill 
   
   \vspace{1cm}
 }}
@@ -410,6 +411,62 @@ Dans son article original, Schoof (voir \cite{ref1}) propose une amélioration p
 
 \section{Étude de la complexité}
 
+\section{Architecture du programme}
+
+Pour rappel, ce programme est écrit avec le langage \verb|C| et j'utilise la librairie \verb|FLINT|.
+\begin{list}{•}{J'ai choisi de décomposer mon programme en trois parties :}
+\item La fonction  \verb|main| qui récupère les arguments au près de l'utilisateur, et qui vérifie que les arguments donne une courbe elliptique sur $\fq$.
+Elle se fine en affichant le cardinal de la courbe elliptique.
+\item La fonction \verb|division_polynomial| remplie un tableau avec tous les polynômes de division.
+J'ai pris le parti de garder en mémoire tous les polynômes de division dans un tableau dynamique.
+En effet, on sait à l'avance que l'on aura au plus $lmax$ polynômes à calculer et on a besoin à de nombreuses reprise des polynômes de division.
+De plus, c'est une récursivité à $\dfrac{n-2}{2}, \dfrac{n-1}{2},\dfrac{n}{2},\dfrac{n+1}{2}$ et $\dfrac{n+2}{2}$ (pour $k=2n$ ou $k=2n+1$).
+
+
+\begin{verbatim}
+void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b,fq_poly_t ecc,
+ulong k, fq_ctx_t fq)
+ENTRÉE :
+    	Tableau de Fq-polynôme tab et k la taille du tableau
+    	Entiers a,b tels que E: y² = x³ + ax + b une courbe elliptique sur Fq
+    	Fq-polynôme eec représentant la courbe elliptique
+    	Corps fini fq à q éléments
+SORTIE :
+    	Tableau de Fq-polynôme tab rempli de k polynôme de division
+\end{verbatim} 
+\item La fonction \verb|schoof| crée un tableau de $lmax$ polynômes de division (remplie par la fonction \verb|division_polynomial|), puis elle exécute l'algorithme de schoof. Et renvoie le cardinal de la courbe elliptique.
+\begin{verbatim}
+void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
+ENTRÉE :
+    	Entier q premier tel que Fq un corps fini à q éléments
+    	Entiers a,b tels que E: y² = x³ + ax + b une courbe elliptique sur Fq
+SORTIE :
+    	Entier card tel que card = #E(Fq)
+\end{verbatim} 
+\end{list}
+
+Par ailleurs, j'ai implémenté une fonction \verb|fmpz_nextprime| qui renvoi le prochain nombre premier. 
+En effet, cette fonction n'est pas inclut dans la librairie \verb|FLINT|. Il est possible d'optimiser cette fonction, cependant dans notre cas les nombres premiers tester sont de l'ordre de $O(log(q))$.
+ 
+\begin{verbatim}
+void fmpz_nextprime(fmpz_t rop, fmpz_t op)
+ENTRÉE :
+    	Entier op tel que op > 2
+SORTIE :
+    	Entier rop
+\end{verbatim} 
+\begin{lstlisting}[language=c]
+void fmpz_nextprime(fmpz_t rop, fmpz_t op)
+{
+    fmpz_add_ui(rop, op, 2);
+    while(!fmpz_is_prime(rop))
+    {
+        fmpz_add_ui(rop, rop, 2);
+    }
+}
+\end{lstlisting}
+
+\section{Résultats expérimentaux}
 
 
 
