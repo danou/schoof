@@ -1,5 +1,14 @@
 #include "schoof.h"
 
+/* Fonction prochain nombre premier
+ *
+ * ENTREE :
+ *  Entier op tel que op > 2
+ * SORTIE :
+ *  Entier rop
+ *
+*/
+
 
 void fmpz_nextprime(fmpz_t rop, fmpz_t op)
 {
@@ -10,8 +19,9 @@ void fmpz_nextprime(fmpz_t rop, fmpz_t op)
     }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/* Fonction du calcul du :
+/* Fonction polynômes de division :
  *
  * ENTREE :
  *  Tableau de Fq-polynôme tab et k la taille du tableau
@@ -224,15 +234,15 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     printf("lmax %lu\n", lmax);
 
     // Construction du tableau de polynôme de division
-    tab = malloc((lmax +1) * sizeof(fq_poly_t));
+    tab = malloc((lmax + 3) * sizeof(fq_poly_t));
     if(tab == NULL)
     {
         fprintf(stderr, "You need more memory.\n"); exit(EXIT_FAILURE);
     }
-    for(i = 0; i <= lmax; i++) fq_poly_init(tab[i], fq);
+    for(i = 0; i <= lmax + 2; i++) fq_poly_init(tab[i], fq);
 
     // Remplissage du tableau
-    division_polynomial(tab, a, b, ecc, lmax, fq);
+    division_polynomial(tab, a, b, ecc, lmax + 2, fq);
 
     //for(i = 0; i <= lmax ; i++) { printf("%lu : ", i) ; fq_poly_print_pretty(tab[i], "X", fq) ; printf("\n"); }
 
@@ -531,7 +541,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fmpz_sub(card, card, trace);
 
     // Libération de la mémoire du tableau :
-    for(i = 0; i <= lmax; i++) fq_poly_clear(tab[i], fq);
+    for(i = 0; i <= lmax + 2; i++) fq_poly_clear(tab[i], fq);
     free(tab);
 
     // Libération de la mémoire des variables :
