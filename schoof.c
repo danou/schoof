@@ -60,6 +60,7 @@ int main(int agrc, char** argv)
     fq_clear(delta, fq); fq_clear(tmp_fq, fq);
 
     // Fonction schoof
+    printf("La fonction de schoof :\n");
     schoof(card, A, B, q, fq);
 
     // Affichage du résultat 

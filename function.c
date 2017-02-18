@@ -1,5 +1,16 @@
 #include "schoof.h"
 
+
+void fmpz_nextprime(fmpz_t rop, fmpz_t op)
+{
+    fmpz_add_ui(rop, op, 2);
+    while(!fmpz_is_prime(rop))
+    {
+        fmpz_add_ui(rop, rop, 2);
+    }
+}
+
+
 /* Fonction du calcul du :
  *
  * ENTREE :
@@ -26,7 +37,7 @@ void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k,
     fq_init(tmp, fq);
     fq_init(tmp1, fq);
 
-    // On traite à part les cas de f0 à f5
+    // On traite à part les cas de f0 à f4
     // Initialisation de f0
     fq_poly_zero(tab[0], fq); // f0 = 0
     fq_poly_one(tab[1], fq); // f1 = 1
@@ -141,8 +152,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
     // Déclaration :
     ulong lmax, i, k, l, tho;
-    mpz_t lmax_mpz, M_mpz, sqrt_mpz;
-    fmpz_t M, l_fmpz, trace, sqrt, tmp, k_fmpz, tho_fmpz;
+    fmpz_t M, l_fmpz, lmax_fmpz, trace, sqrt, tmp, k_fmpz, tho_fmpz;
     fq_t tmp_fq, tmp1_fq, one; // constantes temporaires;
     fq_poly_t ecc; // ecc = X³ + aX + b
     fq_poly_t gcd_poly; // pgcd
@@ -156,16 +166,12 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fq_poly_t* tab = NULL;
 
     // Initialisation :
-    mpz_init(sqrt_mpz);
-    mpz_init_set_ui(M_mpz, 2);
-    mpz_init_set_ui(lmax_mpz, 3);
-
-    // Initialisation :
     fmpz_init(trace);
     fmpz_init(sqrt);
     fmpz_init(tmp);
     fmpz_init(k_fmpz);
     fmpz_init(tho_fmpz);
+    fmpz_init(lmax_fmpz);
     fmpz_init_set_ui(M, 2); 
     fmpz_init_set_ui(l_fmpz, 3);
     fmpz_sqrt(sqrt, q);
@@ -207,27 +213,23 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fq_poly_set_coeff(frob3, 1, one, fq);
 
     //Initialisation de lmax pour initialiser le tableau
-    gmp_printf("M %Zd\n", M_mpz);
-    gmp_printf("lmax %Zd\n", lmax_mpz);
-    while(mpz_cmp(M_mpz, sqrt_mpz) < 0)
+    while(fmpz_cmp(M, sqrt) < 0)
     {
-        mpz_mul(M_mpz, M_mpz, lmax_mpz);
-        gmp_printf("M %Zd\n", M_mpz);
-        mpz_nextprime(lmax_mpz, lmax_mpz);
-        gmp_printf("lmax %Zd\n", lmax_mpz);
+        fmpz_mul(M, M, l_fmpz);
+        fmpz_set(lmax_fmpz, l_fmpz);
+        fmpz_nextprime(l_fmpz, l_fmpz);
+        if(fmpz_equal(l_fmpz, q)) fmpz_nextprime(l_fmpz, l_fmpz);
     }
-    lmax = 7;//mpz_get_ui(lmax_mpz);
-
+    lmax = fmpz_get_ui(lmax_fmpz);
     printf("lmax %lu\n", lmax);
 
     // Construction du tableau de polynôme de division
-    tab = malloc((lmax +1 ) * sizeof(fq_poly_t));
+    tab = malloc((lmax +1) * sizeof(fq_poly_t));
     if(tab == NULL)
     {
         fprintf(stderr, "You need more memory.\n"); exit(EXIT_FAILURE);
     }
     for(i = 0; i <= lmax; i++) fq_poly_init(tab[i], fq);
-    printf("lmax %lu", lmax);
 
     // Remplissage du tableau
     division_polynomial(tab, a, b, ecc, lmax, fq);
@@ -243,6 +245,8 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
 
     // Cas général :
+    fmpz_set_ui(M, 2);
+    fmpz_set_ui(l_fmpz, 3);
     while(fmpz_cmp(M, sqrt) < 0)
     {
         fmpz_mod(k_fmpz, q, l_fmpz); // k = q [l]
@@ -278,12 +282,9 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
         // Test du pgcd
         fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
-        
-        
+
         fq_poly_print_pretty(gcd_poly, "X", fq);printf("\n");
-        
-        
-        
+
         if(!fq_poly_is_one(gcd_poly, fq))
         {
             // Test de q carré modulo l
@@ -447,13 +448,13 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
                 fq_poly_pow(tmp1_poly, tab[tho + 1], fmpz_get_si(q), fq);
                 fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
                 fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
-                
-                
+
+
                 fq_poly_rem(tmp_poly, gcd_poly, tab[l], fq);
 
                 fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
-                
-                
+
+
 
                 if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq))
                 {
@@ -515,9 +516,9 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
         // Incrémentation de la boucle
         fmpz_mul(M, M, l_fmpz);
-        fmpz_add_ui(l_fmpz, l_fmpz, 2);
-        while(fmpz_is_prime(l_fmpz) != 1) fmpz_add_ui(l_fmpz, l_fmpz, 1); // on fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible
-        fmpz_print(l_fmpz);
+        // on fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible
+        fmpz_nextprime(l_fmpz, l_fmpz);
+        if(fmpz_equal(l_fmpz, q)) fmpz_nextprime(l_fmpz, l_fmpz);
         printf("\n");
     }
 
@@ -538,5 +539,4 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fq_poly_clear(tmp_poly, fq); fq_poly_clear(tmp1_poly, fq); fq_poly_clear(alpha, fq); fq_poly_clear(beta, fq);
     fq_clear(tmp_fq, fq); fq_clear(tmp1_fq, fq); fq_clear(one, fq);
     fmpz_clear(M); fmpz_clear(l_fmpz); fmpz_clear(sqrt); fmpz_clear(trace); fmpz_clear(tmp); fmpz_clear(k_fmpz); fmpz_clear(tho_fmpz);
-    mpz_clear(sqrt_mpz); mpz_clear(lmax_mpz); mpz_clear(M_mpz);
 }
