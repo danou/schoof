@@ -92,6 +92,10 @@
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}[section]
 
+% corollaire
+\theoremstyle{plain}
+\newtheorem{corollaire}{Corollaire}[section]
+
 % remarque
 \newtheoremstyle{remark}
   {\topsep}%   space before
@@ -165,7 +169,7 @@
 
 
 % TITRE DU DOCUMENT
-\title{Comptage de points de courbes elliptique sur des corps finis}
+\title{Comptage de points d'une courbe elliptique sur des corps finis}
 \author{Daniel RESENDE}
 \date{\today}
 
@@ -222,13 +226,18 @@ $$\begin{array}{clcl}
 \end{definition}
 
 \begin{definition}[Trace]
-Soit $E$ une courbe elliptique sur $\fq$. La trace de $E(\fq)$ est l'entier $t=q+1-\#E(\fq)$.
+Soit $E$ une courbe elliptique sur $\fq$. La trace de $E(\fq)$ est l'entier $t\in\mathbf{Z^{*}}$ tel que  
+\begin{equation}
+t=q+1-\#E(\fq)
+\label{trace}
+\end{equation}.
 \end{definition}
 
 \begin{proposition}
 Soit la trace $t$ de $E(\fq)$, on a alors 
 \begin{equation}
 \phi^{2} - t\phi + q = 0
+\label{trace1}
 \end{equation}
 \end{proposition}
 
@@ -236,10 +245,12 @@ Soit la trace $t$ de $E(\fq)$, on a alors
 Soit $E$ une courbe elliptique sur $\fq$ et la trace $t$ de $E(\fq)$.
 On a \begin{equation}
 \mid t\mid\leq 2\sqrt{q},
+\label{hasse}
 \end{equation}
 et par conséquent
 \begin{equation}
 \mid\#E(\fq)-(q+1)\mid\leq 2\sqrt{q}
+\label{hasse1}
 \end{equation}
 \end{theoreme}
 
@@ -285,15 +296,12 @@ On construit $f_{n}$ par récurrence sur $n\in\mathbf{Z}_{\geq 1}$ :
 \item $\psi_{3}(X)=3X^{4} + 6aX^{2} + 12bX - a^{2}$,
 \item $\psi_{4}(X)=4Y(X^{6} + 5aX^{4} + 20bX^{3} - 5a^{2}X^{2} - 4bX - 8b^{2} - a^{3}$,
 \item $f_{2n}(X,Y)=f_{n}(f_{n+2}f_{n-1}^{2} - f_{n-2}f_{n+1}^{2})$,
-
 \item $$
 f(n) = \left\{ 
-\begin{array}{l l}
+\begin{array}{cl cl}
   \bar{\psi_{n}}(X,Y) & \quad \text{si } n \text{ est pair}\\
   \bar{\psi_{n}}(X,Y)/Y & \quad \text{si } n \text{ est impair}\\ \end{array} \right.
 $$
-
-
 \item $f_{2n+1}(X,Y)=\psi_{n+2}\psi_{n}^{3} - \psi_{n+1}^{3}\psi_{n-1}$,
 \end{enumerate}
 \end{proposition}
@@ -302,17 +310,61 @@ $$
 Voir \cite{ref4}.
 \end{proof}
 
+\begin{proposition}
+Soit $P=(x,y)\in E(\bar{\fq})$ avec $P\notin E[2]$ et $n\in\mathbf{Z}_{\geq -1}$. Alors 
+\begin{equation}
+nP = \vartheta \Longleftrightarrow \psi_{n} = 0
+\label{np}
+\end{equation}
+d'où
+\begin{equation}
+nP = \vartheta \Longleftrightarrow f_{n} = 0
+\label{np1}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Voir caractérisation des points de torsion \cite{ref4}. 
+\end{proof}
+
+\begin{proposition}
+Soit $P=(x,y)\in E(\bar{\fq})$ et $n\in\mathbf{Z}_{\geq 1}$. Alors 
+\begin{equation}
+nP = \left(x - \dfrac{\psi_{n - 1}\psi_{n + 1}}{\psi_{n}^{2}}, x - \dfrac{\psi_{n + 2}\psi_{n - 1}^{2} - \psi_{n - 2}\psi_{n + 1}^{2}}{4Y\psi_{n}^{3}}\right)
+\label{np2}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Voir \cite{ref6}.
+\end{proof}
+  
+On définit l'application $
+\begin{array}{cl cl}
+End_{\fq}(E)&\longrightarrow&End_{Gal(\bar{\fq}/\fq)}(E[l])\\
+\phi&\longmapsto&\phi_{l}
+\end{array}
+$ avec $l$ premier.
+
+On obtient l'équation par l'application précédente et l'équation \eqref{trace1} :
+\begin{equation}
+\phi_{l}^{2} - t\phi_{l} + q = 0
+\label{trace2}
+\end{equation}
+
+Puis si on appliques \eqref{trace2} à un point $P\in E(\fq)$, on a alors 
+\begin{equation}
+(\phi_{l}^{2} - t\phi_{l} + q)P = 0
+\label{trace2}
+\end{equation}
 
 
-
-
-
-\clearpage
 \section{Algorithme de Schoof}
 \subsection{Cas général}
 
 Cette algorithme consiste à calculer la trace du frobénius modulo tous les $l<l_{max}$ tel que $l_{max}$ soit le plus grand nombre premier vérifiant :\begin{equation} 
 \prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l > 4\sqrt{q}.
+\label{primorielle}
 \end{equation}
 Une fois calculé la trace modulo toutes les $l$-torsions, on utilise le Théorème des Restes Chinois (CRT) pour obtenir la trace dans $\fq$. Puis on utilise le théoreme de Hasse pour avoir le cardinal de la courbe $E$ sur $\fq$.
 
@@ -344,16 +396,23 @@ Voici le descriptif de l’algorithme de Schoof:
 \end{algorithm}
 \end{theoreme}
 
+
+Nous regardons cette algorithme plus en détail.\\
+
+Dans le \textbf{cas $l = 2$}, on cherche les points de 2-torsions, 
+\begin{equation}
+t=1\ mod\ 2\Leftrightarrow pgcd(X^{3} + aX + b, X^{q} - X) = 1
+\label{cas2}
+\end{equation}
 \begin{proof}
-\begin{description}
-\item
-\item[Cas mod 2] Dans ce cas, on cherche les points de 2-torsions, \ie les points spéciaux de la courbes.
-$$t=1\ mod\ 2 \Leftrightarrow \#E(\fq)[2] = 1 \Leftrightarrow X^{3} + aX + b\text{ est irreductible sur }\fq\Leftrightarrow pgcd(X^{3} + aX + b, X^{q} - X) = 1$$
-\item 
-\end{description}
+$$
+\begin{array}{cl cl}
+t=1\ mod\ 2 &\Leftrightarrow& \#E(\fq)[2] = 1\ (i.e.\ \#E(\fq)[2]=\{\vartheta\})\\
+&\Leftrightarrow& X^{3} + aX + b\text{ est irreductible sur }\fq\\
+&\Leftrightarrow& pgcd(X^{3} + aX + b, X^{q} - X) = 1
+\end{array}
+$$
 \end{proof}
-
-
 
 
 
@@ -407,20 +466,60 @@ Dans son article original, Schoof (voir \cite{ref1}) propose une amélioration p
 \end{algorithmic}
 \end{algorithm}
 
-\clearpage 
-
 \section{Étude de la complexité}
+
+Dans cette section, nous allons étudier complexité de l'algorithme de schoof et faire une brève comparaison avec les autres méthodes de comptage de points.
+
+\subsection{Complexité de Schoof}
+
+Tout d'abord commençons par la complexité de la cherche de $l_{max}$ tel que il soit le plus grand nombre premier vérifiant la relation \eqref{primorielle}.
+
+\begin{theoreme}[Théorème des nombres premiers]
+Soit $\pi(x)$ le nombre de premier plus petit que $x$. On a alors que $$
+\begin{array}{cl cl}
+\pi(x)\leadsto\frac{x}{log(x)}\\
+x \leadsto +\infty 
+\end{array}$$
+\end{theoreme}
+\begin{proof}
+Voir \cite{ref5}.
+\end{proof}
+\begin{theoreme}[Théorème des nombres premiers]
+Soit $\pi(x)$ le nombre de premier plus petit que $x$. On a alors que $$
+\begin{array}{cl cl}
+\pi(x)\leadsto\frac{x}{log(x)}\\
+x \leadsto +\infty 
+\end{array}$$
+\end{theoreme}
+\begin{proof}
+Voir \cite{ref5}.
+\end{proof}
+\begin{remarque}
+Le théorème précédent donne aussi la relation suivante :
+$$log\left(\prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l\right) \leadsto lmax$$
+D'où $$\prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l\leadsto e^{lmax}$$  
+\end{remarque}
+On en déduit que $e^{lmax}>4\sqrt{q} \Rightarrow lmax = O(log(q))$. Et par conséquent, on a $O\left(\frac{log(q)}{log(log(q))}\right)$, \ie $O(log(q))$ torsion à calculer.
+
+
+Ensuite nous calculons la complexité de la création du tableau de polynôme de division.
+On doit pour se faire calculer $lmax = O(log(q))$ polynômes avec 9 (cas pair) ou 11 (cas impair) opérations élémentaires à chaque tour. Le coût total de la création du tableau est de $O(log(q))$.
+
+ 
+
+
+\subsection{Comparaison avec les autres méthodes}
 
 \section{Architecture du programme}
 
-Pour rappel, ce programme est écrit avec le langage \verb|C| et j'utilise la librairie \verb|FLINT|.
+Pour rappel, ce programme est écrit avec le langage \verb|C| et j'utilise la librairie \verb|FLINT| afin de manipuler des polynômes dans $\fq$.
 \begin{list}{•}{J'ai choisi de décomposer mon programme en trois parties :}
 \item La fonction  \verb|main| qui récupère les arguments au près de l'utilisateur, et qui vérifie que les arguments donne une courbe elliptique sur $\fq$.
 Elle se fine en affichant le cardinal de la courbe elliptique.
 \item La fonction \verb|division_polynomial| remplie un tableau avec tous les polynômes de division.
 J'ai pris le parti de garder en mémoire tous les polynômes de division dans un tableau dynamique.
 En effet, on sait à l'avance que l'on aura au plus $lmax$ polynômes à calculer et on a besoin à de nombreuses reprise des polynômes de division.
-De plus, c'est une récursivité à $\dfrac{n-2}{2}, \dfrac{n-1}{2},\dfrac{n}{2},\dfrac{n+1}{2}$ et $\dfrac{n+2}{2}$ (pour $k=2n$ ou $k=2n+1$).
+De plus, c'est une récursivité à $\frac{n-2}{2}, \frac{n-1}{2},\frac{n}{2},\frac{n+1}{2}$ et $\frac{n+2}{2}$ (pour $k=2n$ ou $k=2n+1$).
 
 
 \begin{verbatim}
