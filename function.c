@@ -62,6 +62,7 @@ void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k,
     fq_mul_ui(tmp, b, 12, fq); // tmp = 12b
     fq_poly_set_coeff(tab[3], 1, tmp, fq);
     fq_sqr(tmp, a, fq); // tmp = a²
+    fq_neg(tmp, tmp, fq); // tmp = -a²
     fq_poly_set_coeff(tab[3], 0, tmp, fq);
 
     // Initialisation de f4
@@ -210,7 +211,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
     // Initialisation du polynôme X^q-X
     fq_poly_set_coeff(frob, fmpz_get_si(q), one, fq); // je transforme q en slong
-    fq_neg(tmp_fq, tmp_fq, fq); // tmp_fq = -1
+    fq_neg(tmp_fq, one, fq); // tmp_fq = -1
     fq_poly_set_coeff(frob, 1, tmp_fq, fq);
 
     // Initialisation du polynôme X^q²-X
@@ -231,7 +232,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
         if(fmpz_equal(l_fmpz, q)) fmpz_nextprime(l_fmpz, l_fmpz);
     }
     lmax = fmpz_get_ui(lmax_fmpz);
-    printf("lmax %lu\n", lmax);
+    printf("lmax = %lu\n", lmax);
 
     // Construction du tableau de polynôme de division
     tab = malloc((lmax + 3) * sizeof(fq_poly_t));
@@ -244,13 +245,12 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     // Remplissage du tableau
     division_polynomial(tab, a, b, ecc, lmax + 2, fq);
 
-    //for(i = 0; i <= lmax ; i++) { printf("%lu : ", i) ; fq_poly_print_pretty(tab[i], "X", fq) ; printf("\n"); }
+    for(i = 0; i <= lmax + 2 ; i++) { printf("%lu : ", i) ; fq_poly_print_pretty(tab[i], "X", fq) ; printf("\n"); }
 
 
     // Cas l = 2 :
     fq_poly_gcd(gcd_poly, frob, ecc, fq);
-
-    if(fq_poly_is_one(gcd_poly, fq)) fmpz_set_ui(trace, 1); // si pgcd = 1 alors t = 1 [M], sinon t = 0 [M] avec ici M = 2  //
+    if(fq_poly_is_one(gcd_poly, fq)) fmpz_set_ui(trace, 1); // si pgcd = 1 alors t = 1 [M], sinon t = 0 [M] avec ici M = 2
     printf("t = "); fmpz_print(trace) ; printf(" [2]\n");
 
 
@@ -293,7 +293,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
         // Test du pgcd
         fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
 
-        fq_poly_print_pretty(gcd_poly, "X", fq);printf("\n");
+        //fq_poly_print_pretty(gcd_poly, "X", fq);printf("\n");
 
         if(!fq_poly_is_one(gcd_poly, fq))
         {
@@ -366,7 +366,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
                     fq_poly_sqr(tmp_poly, tab[k + 2], fq);
                     fq_poly_mul(tmp_poly, tmp_poly, tab[k - 1], fq);
                     fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
-                    printf("k = %lu\n",k);
+                    //printf("k = %lu\n",k);
 
                     // Effet de bords
                     if(k == 0x1) 
@@ -432,7 +432,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
             fq_poly_mul(beta, beta, tab[k], fq);
 
             // On teste tous les tho possible tel que 0 < tho < l
-            for(tho = 1; tho < l ; tho++)
+            for(tho = 1; tho < l/2 ; tho++)
             {
                 fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
                 fq_poly_mul(gcd_poly, frob3, tab[k], fq);
@@ -462,9 +462,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                 fq_poly_rem(tmp_poly, gcd_poly, tab[l], fq);
 
-                fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
-
-
+                //fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
 
                 if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq))
                 {
@@ -510,7 +508,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                     fq_poly_rem(tmp_poly, gcd_poly, tab[l], fq);
 
-                    fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
+                    //fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
 
 
                     if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq)) fmpz_neg(tmp, tmp);
