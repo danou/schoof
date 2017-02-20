@@ -42,7 +42,7 @@
 
   Université Paris-Saclay \hfill Algorithmique et programmation C
   
-  2016 - 2017 \hfill 
+  2016 - 2017 \hfill MIT Licence
   
   \vspace{1cm}
 }}
@@ -170,7 +170,7 @@
 
 % TITRE DU DOCUMENT
 \title{Comptage de points d'une courbe elliptique sur des corps finis}
-\author{Daniel RESENDE}
+\author{Daniel RESENDE\\supervisé par Luca DE FEO}
 \date{\today}
 
 \newcommand\fq{\mathbf{F}_{q}}
@@ -193,20 +193,19 @@ Il s'agit de la description de l'algorithme de René Schoof. Celui-ci fût le pr
 \includegraphics[width=3cm]{Rene_Schoof.jpg}
 \caption{\label{étiquette}Portrait René Schoof}
 \end{wrapfigure}
-Les courbes elliptiques définissent une lois de groupe sur les corps finis $\fq$ qui est difficile pour le problème du logarithme discret. On retrouve par conséquent son utilisation dans plusieurs schémas cryptographiques comme Diffie-Hellman (avec ECDH) ou El-Gamal (avec ECDSA).
-Cependant, l'utilisation de schémas à l'aide de courbes elliptiques nécessite d'avoir un grand nombre premier qui divise l'ordre d'un sous-groupe cyclique de la courbe de $E(\fq)$. Nous avons donc besoin de connaitre le cardinal de $E(\fq)$.
+Les courbes elliptiques définissent une loi de groupe sur les corps finis $\fq$ qui est difficile pour le problème du logarithme discret. On retrouve par conséquent son utilisation dans plusieurs schémas cryptographiques comme Diffie-Hellman (avec ECDH) ou El-Gamal (avec ECDSA).
+Cependant, l'utilisation de schémas à l'aide de courbes elliptiques nécessite d'avoir un grand nombre premier qui divise l'ordre d'un sous-groupe cyclique de $E(\fq)$. Nous avons donc besoin de connaitre le cardinal de $E(\fq)$.
 
 \begin{list}{•}{Il existe aujourd'hui de nombres algorithme de comptage de points d'une courbes elliptiques sur un corps finis $\fq$ :}
-\item L'algorithme Baby Step Giant Step basé sur le théorème de Hasse,
+\item L'algorithme de Shank en 1971 basé sur Baby Step Giant Step et le théorème de Hasse,
 \item L'algorithme Schoof en 1985 que l'on va étudier dans ce mémoire,
 \item L'algorithme SEA [Schoof, Elkies, Atkin] en 1995 qui est une amélioration de l'algorithme de Schoof,
 \item L'algorithme de Satoh en 2005 basé sur le relèvement canonique sur les $\mathbf{Z}$ $q$-adiques,
 \item L'algorithme AGM [Mestre] basé sur le calcul de suites arithmetico-géométriques.
 \end{list}
 
-Dans ce projet, je vais vous présenter un algorithme de comptage de points de courbes elliptique sur des corps finis. Je me restreindrais à des corps finis $\fq$ avec $q=p^{n}$ et $p$ premier différent de 2 et 3. Pour c'est deux derniers cas, l'algorithme est sensiblement le même. 
+Dans ce projet, je vais vous présenter un algorithme de comptage de points d'une courbe elliptique sur des corps finis. Je me restreindrais à des corps finis $\fq$ avec $q=p^{n}$ et $p$ premier différent de 2 et 3. Pour c'est deux derniers cas, l'algorithme est sensiblement le même. 
 
-%\clearpage
 \section{Courbes elliptiques sur $\fq$}
 
 Soit $\fq$ un corps fini à $p$ éléments de caractéristiques $p\neq 2,3$.
@@ -272,7 +271,7 @@ et par conséquent
 \end{equation}
 \end{theoreme}
 
-Nous allons maintenant nous concentrer sur les sous-groupe de $n$-torsions $E[n]$ avec $n\in\mathbf{Z}_{\geq -1}$ tel que $p\nshortmid n$. Et on introduit la notion de polynôme de division.
+On va maintenant nous concentrer sur les sous-groupe de $n$-torsions $E[n]$ avec $n\in\mathbf{Z}_{\geq -1}$ tel que $p\nshortmid n$. Et on introduit la notion de polynôme de division.
 
 \begin{definition}[Polynôme de division]
 Soit $n\in\mathbb{Z}^{*}$, le polynôme de division $\psi_{n}$ est la fonction polynôme de $K[E]$ de coefficient dominent $n$ et de diviseur $$div(\psi_{n})=(E[n])-n^{2}(\vartheta)$$
@@ -294,10 +293,10 @@ On construit le polynôme de division par récurrence sur $n\in\mathbf{Z}_{\geq 
 Voir \cite{ref4}.
 \end{proof}
 
-Dans l'algorithme de Schoof, nous utiliserons une variante du polynôme de division.
+Dans l'algorithme de Schoof, on utilisera une variante du polynôme de division.
 
 \begin{definition}
-Soit $n\in\mathbb{Z}^{*}$, le polynôme $f_{n}$ est une fonction polynôme de $K[E]$ définie par les relations suivantes : 
+Soit $n\in\mathbb{Z}^{*}$, le polynôme $f_{n}\in K[E]$ définie par la relation suivante : 
 $$
 f(n) = \left\{
 \begin{array}{l l}
@@ -384,7 +383,7 @@ Cette algorithme consiste à calculer la trace du frobénius modulo tous les $l<
 \prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l > 4\sqrt{q}.
 \label{primorielle}
 \end{equation}
-Une fois calculé la trace modulo toutes les $l$-torsions, on utilise le Théorème des Restes Chinois (CRT) pour obtenir la trace dans $\fq$. Puis on utilise le théoreme de Hasse pour avoir le cardinal de la courbe $E$ sur $\fq$.
+Une fois calculé la trace modulo toutes les $l$-torsions, on utilise le Théorème des Restes Chinois (CRT) pour obtenir la trace dans $\fq$. Puis le théoreme de Hasse pour avoir le cardinal de la courbe $E$ sur $\fq$.
 
 
 \begin{algorithm}[H]
@@ -412,7 +411,7 @@ Une fois calculé la trace modulo toutes les $l$-torsions, on utilise le Théor�
 \end{algorithm}
 
 
-On regarde cette algorithme plus en détail sur le calcul de la trace modulo $l$.\\
+On regarde cette algorithme plus en détails sur le calcul de la trace modulo $l$.\\
 
 \textbf{Dans le cas $l = 2$}, on cherche les points de 2-torsions, 
 \begin{equation}
@@ -424,7 +423,7 @@ $$
 \begin{array}{cl cl}
 t=1\ mod\ 2 &\Leftrightarrow& \#E(\fq)[2] = 1\ (i.e.\ \#E(\fq)[2]=\{\vartheta\})\\
 &\Leftrightarrow& x^{3} + ax + b\text{ est irreductible sur }\fq\\
-&\Leftrightarrow& pgcd(X^{3} + ax + b, x^{q} - x = 1
+&\Leftrightarrow& pgcd(X^{3} + ax + b, x^{q} - x) = 1
 \end{array}
 $$
 \end{proof}
@@ -473,7 +472,7 @@ Où $$
 
 
 \begin{remarque}
-Pour résumer, si un $\tau$ vérifie \eqref{abscisse} et \eqref{ordonnée}, alors la trace est égale à $\tau$ modulo $l$. Sinon si aucun $\tau$ ne vérifie les deux relation, alors la trace est nulle modulo $l$.
+Pour résumer, si un $\tau$ vérifie \eqref{abscisse} et \eqref{ordonnée}, alors la trace est égale à $\tau$ modulo $l$. Sinon si aucun $\tau$ ne vérifie les deux relations, alors la trace est nulle modulo $l$.
 \end{remarque}
 
 \begin{remarque}
@@ -521,15 +520,12 @@ Dans son article original, Schoof (voir \cite{ref1}) propose une amélioration p
 \end{algorithmic}
 \end{algorithm}
 
-\begin{itemize}
-\item Si $\forall P$ nonzéro \begin{equation}
+On regarde si $\forall P$ nonzéro \begin{equation}
 \phi_{l}^{2}P = \pm kP
 \label{carré}
-\end{equation} avec $q\equiv k[l]$ 
-\item Sinon on fait le cas général.
-\end{itemize}
+\end{equation} avec $q\equiv k[l]$, sinon on fait le cas général.
 
-On va donc transformer l'équation \eqref{carré} en un calcul de $pgcd$ pour pouvoir l'implémenter sur machine.
+Pour ce faire, on va donc transformer l'équation \eqref{carré} en un calcul de $pgcd$ pour pouvoir l'implémenter sur machine.
 
 \begin{eqnarray}
 \phi_{l}^{2}(P)&=&\pm kP \nonumber\\ 
@@ -540,7 +536,7 @@ x-\dfrac{f_{k - 1}f_{k + 1}(x^{3} + ax +b)}{f_{k}^{2}}&\text{ si }k\text{ impair
 \end{cases}
 \end{eqnarray}
 
-On prend l'équation \eqref{pgcd} et on met tout au même dénominateur. on obtient le résultat suivant :
+On prend l'équation \eqref{pgcd} et on met tout au même dénominateur. n obtient le résultat suivant :
 \begin{equation}
 \begin{cases}(x^{q^{2}} - x)f_{k}^{2}(x^{3} + ax +b) + f_{k - 1}f_{k + 1}= 0&\text{ si }k\text{ pair}\\
 (x^{q^{2}} - x)f_{k}^{2} + f_{k - 1}f_{k + 1}(x^{3} + ax +b)= 0&\text{ si }k\text{ impair}
@@ -556,9 +552,36 @@ pgcd((x^{q^{2}} - x)f_{k}^{2} + f_{k - 1}f_{k + 1}(x^{3} + ax +b),f_{l})&\text{ 
 
 Donc le $pgcd\neq 1$ si et seulement si $\phi_{l}^{2}P = \pm kP$.
 
+\begin{equation}
+\begin{cases}pgcd((x^{q^{2}} - x)f_{k}^{2}(x^{3} + ax +b) + f_{k - 1}f_{k + 1},f_{l})&\text{ si }k\text{ pair}\\
+pgcd((x^{q^{2}} - x)f_{k}^{2} + f_{k - 1}f_{k + 1}(x^{3} + ax +b),f_{l})&\text{ si }k\text{ impair}
+\end{cases}
+\end{equation}
+
+On peux maintenant chercher le $\tau$ tel que $\tau^{2}\equiv 4q [l]$.
+On a alors que si $q$ n'est pas un carré modulo $l$ alors $\tau = 0\ mod\ l$, sinon on note $w$ la racine carré de $q$ modulo $l$. On regarde ensuite si $\pm w$ est une valeur propre de $\phi_{l}$
+On calcule le $pgcd$ suivant : 
+
+\begin{equation}
+\begin{cases}pgcd((x^{q} - x)f_{w}^{2}(x^{3} + ax +b) + f_{w - 1}f_{w + 1},f_{l})&\text{ si }w\text{ pair}\\
+pgcd((x^{q} - x)f_{w}^{2} + f_{w - 1}f_{w + 1}(x^{3} + ax +b),f_{l})&\text{ si }w\text{ impair}
+\end{cases}
+\end{equation}
+
+Donc si le $pgcd = 1$ alors $\tau = 0\ mod\ l$, sinon on doit déterminer de signe de $w$. 
+
+\begin{equation}
+\begin{cases}pgcd(4(x^{3} + ax +  b)^{(q-1)/2}f_{w}^{3} - f_{w + 2}^{2}f_{w - 1} + f_{w - 2}^{2}f_{w - 1},f_{l})&\text{ si }w\text{ pair}\\
+pgcd(4(x^{3} + ax +  b)^{(q-1)/2}f_{w}^{3} - f_{w + 2}^{2}f_{w - 1} + f_{w - 2}^{2}f_{w - 1},f_{l})&\text{ si }w\text{ impair}
+\end{cases}
+\end{equation}
+
+Et par conséquent si le $pgcd = 1$ alors $\tau = -w\ mod\ l$, sinon $\tau = w\ mod\ l$
+
+
 \section{Étude de la complexité}
 
-Dans cette section, nous allons étudier complexité de l'algorithme de schoof et faire une brève comparaison avec les autres méthodes de comptage de points.
+Dans cette section, on va étudier complexité de l'algorithme de schoof et faire une brève comparaison avec les autres méthodes de comptage de points.
 
 \subsection{Complexité de Schoof}
 
@@ -592,21 +615,37 @@ D'où $$\prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l\leadsto e^{lmax}$$
 On en déduit que $e^{lmax}>4\sqrt{q} \Rightarrow lmax = O(log(q))$. Et par conséquent, on a $O\left(\frac{log(q)}{log(log(q))}\right)$, \ie $O(log(q))$ torsion à calculer.
 
 
-Ensuite nous calculons la complexité de la création du tableau de polynôme de division.
-On doit pour se faire calculer $lmax = O(log(q))$ polynômes avec 9 (cas pair) ou 11 (cas impair) opérations élémentaires à chaque tour. Le coût total de la création du tableau est de $O(log(q))$.
+Ensuite on calcule la complexité de la création du tableau de polynôme de division.
+On doit pour se faire calculer $lmax = O(log(q))$ polynômes avec 9 (cas pair) ou 11 (cas impair) opérations élémentaires à chaque tour. Le coût total de la création du tableau est de $O(log(q))$.\\
+
+
+On aussi que $deg(f_{l})=O(l^{2})=O(log^{2}(q))$ et que le $pgcd$ à une complexité de $O(deg(f_{l})^{2}log^{3}(q))$.
+D'où une complexité pour chaque tour $O(log^{7}(q))$.
+De plus, comme on fait $O(l)=O(log(q))$ tour, on arrive à une complexité à $O(log^{8}(q))$.
+Donc on arrive à une complexité de $O(log^{9}(q))$
+
+Enfin la complexité de CRT est négligeable par rapport à $O(log^{9}(q))$
 
 \subsection{Comparaison avec les autres méthodes}
 
+\begin{list}{•}{}
+\item L'algorithme Schoof est en $O(log^{9}(q))$,
+\item L'algorithme SEA est en $O(log^{4}(q))$,
+\item L'algorithme de Satoh est en $O(n^{3})$.
+\end{list}
+
+
+
 \section{Architecture du programme}
 
-Pour rappel, ce programme est écrit avec le langage \verb|C| et j'utilise la librairie \verb|FLINT| afin de manipuler des polynômes dans $\fq$.
+Pour rappel, ce programme est écrit en langage \verb|C| et j'utilise la librairie \verb|FLINT| afin de manipuler des polynômes dans $\fq$.
 \begin{list}{•}{J'ai choisi de décomposer mon programme en trois parties :}
-\item La fonction  \verb|main| qui récupère les arguments au près de l'utilisateur, et qui vérifie que les arguments donne une courbe elliptique sur $\fq$.
-Elle se fine en affichant le cardinal de la courbe elliptique.
+\item La fonction  \verb|main| qui récupère les arguments auprès de l'utilisateur, et qui vérifie que les arguments donne une courbe elliptique sur $\fq$.
+Elle se finie en affichant le cardinal de la courbe elliptique sur $\fq$.
 \item La fonction \verb|division_polynomial| remplie un tableau avec tous les polynômes de division.
 J'ai pris le parti de garder en mémoire tous les polynômes de division dans un tableau dynamique.
-En effet, on sait à l'avance que l'on aura au plus $lmax$ polynômes à calculer et on a besoin à de nombreuses reprise des polynômes de division.
-De plus, c'est une récursivité à $\frac{n-2}{2}, \frac{n-1}{2},\frac{n}{2},\frac{n+1}{2}$ et $\frac{n+2}{2}$ (pour $k=2n$ ou $k=2n+1$).
+En effet, on sait à l'avance que l'on aura au plus $lmax$ polynômes à calculer et que l'on aura besoin à de nombreuses reprise des polynômes de division.
+De plus, c'est un polynôme défini par récurrence sur $\frac{n-2}{2}, \frac{n-1}{2},\frac{n}{2},\frac{n+1}{2}$ et $\frac{n+2}{2}$ (pour $k=2n$ ou $k=2n+1$).
 
 
 \begin{verbatim}
@@ -655,8 +694,13 @@ void fmpz_nextprime(fmpz_t rop, fmpz_t op)
 \section{Résultats expérimentaux}
 
 
+Voici un exemple tiré de \cite{ref2} de l'algorithme de Schoof : Soit $p=101$ et $E : y^{2} = x^{3} + 3x + 4$\\
+On a $l = 2, 3, 5, 7$ et $t=0[2], t=1[3], t=0[5], t=3[7]$.
+D'où $\#E(\mathbf{F}_{101}) = 92$.
 
- 
+Malheureusement à l'heure actuelle, le programme que j'ai implémenté compile et renvoi un résultat mais qui n'est pas cohérent.
+Je pense qu'il doit y avoir une erreur dans un des polynômes que je n'ai pas réussi à trouver.
+
 \clearpage 
 \nocite{*} 
 \bibliographystyle{alpha}
