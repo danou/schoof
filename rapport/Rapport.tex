@@ -208,7 +208,7 @@ Dans ce projet, je vais vous présenter un algorithme de comptage de points d'un
 
 \section{Courbes elliptiques sur $\fq$}
 
-Soit $\fq$ un corps fini à $p$ éléments de caractéristiques $p\neq 2,3$.
+Soit $\fq$ un corps fini à $q$ éléments de caractéristiques $p\neq 2,3$.
 
 Soit $E$ une courbe elliptique définie sur $\fq$. On obtient l'équation affine de Weierstra\ss : 
 \begin{equation}
@@ -238,7 +238,7 @@ Soit $E$ une courbe elliptique. On a que $(E(\fq), +)$ est un groupe additif tel
 Soit $\varPhi$ l'endomorphisme de Frobénius d'une courbe elliptique $E$ tel que  
 $$\begin{array}{clcl}
 \varPhi : &E(\bar{\fq}) &\longrightarrow &E(\bar{\fq})\\
-&(x, y) &\longmapsto	&(x^{p}, y^{p}).\\
+&(x, y) &\longmapsto	&(x^{q}, y^{q}).\\
 \end{array}$$
 \end{definition}
 
@@ -310,16 +310,15 @@ où $\bar{\psi_{n}}$ est la réduction de $\psi_{n}$ par les termes en $Y^{2}$ p
 On construit $f_{n}$ par récurrence sur $n\in\mathbf{Z}_{\geq 1}$ :
 \begin{enumerate}
 \item $f_{-1}(X)=-1,\ f_{0}(X)=0,\ f_{1}(X)=1,\ f_{2}(X)=2$,
-\item $\psi_{3}(X)=3X^{4} + 6aX^{2} + 12bX - a^{2}$,
-\item $\psi_{4}(X)=4Y(X^{6} + 5aX^{4} + 20bX^{3} - 5a^{2}X^{2} - 4bX - 8b^{2} - a^{3}$,
-\item $f_{2n}(X,Y)=f_{n}(f_{n+2}f_{n-1}^{2} - f_{n-2}f_{n+1}^{2})$,
+\item $f_{3}(X)=3X^{4} + 6aX^{2} + 12bX - a^{2}$,
+\item $f_{4}(X)=4(X^{6} + 5aX^{4} + 20bX^{3} - 5a^{2}X^{2} - 4bX - 8b^{2} - a^{3}$,
+\item $f_{2n}(X)=f_{n}(f_{n+2}f_{n-1}^{2} - f_{n-2}f_{n+1}^{2})$,
 \item $$
-f(n) = \left\{ 
+f_{2n+1}(X) = \left\{ 
 \begin{array}{cl cl}
-  \bar{\psi_{n}}(X,Y) & \quad \text{si } n \text{ est pair}\\
-  \bar{\psi_{n}}(X,Y)/Y & \quad \text{si } n \text{ est impair}\\ \end{array} \right.
+ &f_{n+2}f_{n}^{3}(x^{2} + ax + b) - f_{n+1}^{3}f_{n-1} \text{ si  } n \text{ est pair}\\
+  &f_{n+2}f_{n}^{3} - f_{n+1}^{3}f_{n-1}(x^{2} + ax + b)\text{ si } n \text{ est impair}\\ \end{array} \right.
 $$
-\item $f_{2n+1}(X,Y)=\psi_{n+2}\psi_{n}^{3} - \psi_{n+1}^{3}\psi_{n-1}$,
 \end{enumerate}
 \end{proposition}
 
