@@ -271,7 +271,7 @@ et par conséquent
 \end{equation}
 \end{theoreme}
 
-On va maintenant nous concentrer sur les sous-groupe de $n$-torsions $E[n]$ avec $n\in\mathbf{Z}_{\geq -1}$ tel que $p\nshortmid n$. Et on introduit la notion de polynôme de division.
+On va maintenant nous concentrer sur les sous-groupes de $n$-torsions $E[n]$ avec $n\in\mathbf{Z}_{\geq -1}$ tel que $p\nshortmid n$. Et on introduit la notion de polynôme de division.
 
 \begin{definition}[Polynôme de division]
 Soit $n\in\mathbb{Z}^{*}$, le polynôme de division $\psi_{n}$ est la fonction polynôme de $K[E]$ de coefficient dominent $n$ et de diviseur $$div(\psi_{n})=(E[n])-n^{2}(\vartheta)$$
@@ -378,7 +378,7 @@ Puis si on appliques \eqref{trace2} à un point $P\in E(\fq)$, on a alors
 \section{Algorithme de Schoof}
 \subsection{Cas général}
 
-Cette algorithme consiste à calculer la trace du frobénius modulo tous les $l<l_{max}$ tel que $l_{max}$ soit le plus grand nombre premier vérifiant :\begin{equation} 
+Cet algorithme consiste à calculer la trace du frobénius modulo tous les $l<l_{max}$ tel que $l_{max}$ soit le plus petit nombre premier vérifiant :\begin{equation} 
 \prod_{l\ premier,\ p\nshortmid l}^{l_{max}}l > 4\sqrt{q}.
 \label{primorielle}
 \end{equation}
@@ -410,7 +410,7 @@ Une fois calculé la trace modulo toutes les $l$-torsions, on utilise le Théor�
 \end{algorithm}
 
 
-On regarde cette algorithme plus en détails sur le calcul de la trace modulo $l$.\\
+On regarde cet algorithme plus en détails sur le calcul de la trace modulo $l$.\\
 
 \textbf{Dans le cas $l = 2$}, on cherche les points de 2-torsions, 
 \begin{equation}
@@ -471,7 +471,7 @@ Où $$
 
 
 \begin{remarque}
-Pour résumer, si un $\tau$ vérifie \eqref{abscisse} et \eqref{ordonnée}, alors la trace est égale à $\tau$ modulo $l$. Sinon si aucun $\tau$ ne vérifie les deux relations, alors la trace est nulle modulo $l$.
+Pour résumer, si un $\tau$ vérifie que \eqref{abscisse} alors $t=-\tau$ modulo $l$, sinon si un $\tau$ vérifie que \eqref{abscisse} et \eqref{ordonnée}, alors $t=\tau$ modulo $l$. Si aucun $\tau$ vérifie les deux relations, alors la trace est nulle modulo $l$.
 \end{remarque}
 
 \begin{remarque}
@@ -535,7 +535,7 @@ x-\dfrac{f_{k - 1}f_{k + 1}(x^{3} + ax +b)}{f_{k}^{2}}&\text{ si }k\text{ impair
 \end{cases}
 \end{eqnarray}
 
-On prend l'équation \eqref{pgcd} et on met tout au même dénominateur. n obtient le résultat suivant :
+On prend l'équation \eqref{pgcd} et on met tout au même dénominateur. On obtient le résultat suivant :
 \begin{equation}
 \begin{cases}(x^{q^{2}} - x)f_{k}^{2}(x^{3} + ax +b) + f_{k - 1}f_{k + 1}= 0&\text{ si }k\text{ pair}\\
 (x^{q^{2}} - x)f_{k}^{2} + f_{k - 1}f_{k + 1}(x^{3} + ax +b)= 0&\text{ si }k\text{ impair}
@@ -551,14 +551,8 @@ pgcd((x^{q^{2}} - x)f_{k}^{2} + f_{k - 1}f_{k + 1}(x^{3} + ax +b),f_{l})&\text{ 
 
 Donc le $pgcd\neq 1$ si et seulement si $\phi_{l}^{2}P = \pm kP$.
 
-\begin{equation}
-\begin{cases}pgcd((x^{q^{2}} - x)f_{k}^{2}(x^{3} + ax +b) + f_{k - 1}f_{k + 1},f_{l})&\text{ si }k\text{ pair}\\
-pgcd((x^{q^{2}} - x)f_{k}^{2} + f_{k - 1}f_{k + 1}(x^{3} + ax +b),f_{l})&\text{ si }k\text{ impair}
-\end{cases}
-\end{equation}
-
 On peux maintenant chercher le $\tau$ tel que $\tau^{2}\equiv 4q [l]$.
-On a alors que si $q$ n'est pas un carré modulo $l$ alors $\tau = 0\ mod\ l$, sinon on note $w$ la racine carré de $q$ modulo $l$. On regarde ensuite si $\pm w$ est une valeur propre de $\phi_{l}$
+On a alors que si $q$ n'est pas un carré modulo $l$ alors $\tau = 0\ mod\ l$, sinon on note $w$ la racine carré de $q$ modulo $l$. On regarde ensuite si $\pm w$ est une valeur propre de $\phi_{l}$.
 On calcule le $pgcd$ suivant : 
 
 \begin{equation}
@@ -575,7 +569,7 @@ pgcd(4(x^{3} + ax +  b)^{(q-1)/2}f_{w}^{3} - f_{w + 2}^{2}f_{w - 1} + f_{w - 2}^
 \end{cases}
 \end{equation}
 
-Et par conséquent si le $pgcd = 1$ alors $\tau = -w\ mod\ l$, sinon $\tau = w\ mod\ l$
+Et par conséquent si le $pgcd = 1$ alors $\tau = -2w\ mod\ l$, sinon $\tau = 2w\ mod\ l$
 
 
 \section{Étude de la complexité}
@@ -584,18 +578,8 @@ Dans cette section, on va étudier complexité de l'algorithme de schoof et fair
 
 \subsection{Complexité de Schoof}
 
-Tout d'abord commençons par la complexité de la cherche de $l_{max}$ tel que il soit le plus grand nombre premier vérifiant la relation \eqref{primorielle}.
+Tout d'abord commençons par la complexité de la cherche de $l_{max}$ tel qu'il soit le plus grand nombre premier vérifiant la relation \eqref{primorielle}.
 
-\begin{theoreme}[Théorème des nombres premiers]
-Soit $\pi(x)$ le nombre de premier plus petit que $x$. On a alors que $$
-\begin{array}{cl cl}
-\pi(x)\leadsto\frac{x}{log(x)}\\
-x \leadsto +\infty 
-\end{array}$$
-\end{theoreme}
-\begin{proof}
-Voir \cite{ref5}.
-\end{proof}
 \begin{theoreme}[Théorème des nombres premiers]
 Soit $\pi(x)$ le nombre de premier plus petit que $x$. On a alors que $$
 \begin{array}{cl cl}
