@@ -1,6 +1,6 @@
 ---
 title: 
-  Schoof's algorithm
+  Schoof \'s algorithm
 addons:
   style_goodies: yes
 ---
