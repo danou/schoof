@@ -37,8 +37,8 @@ void fmpz_nextprime(fmpz_t rop, fmpz_t op)
 void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k, fq_ctx_t fq)
 {
     // Déclaration
-    ulong i, n;
-    fq_t tmp, tmp1;
+    ulong i, n, e;
+    fq_t tmp, tmp1, invtwo;
     fq_poly_t tmp_poly;
 
     printf("Fonction polynôme de division\n");
@@ -46,6 +46,9 @@ void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k,
     // Initialisation
     fq_init(tmp, fq);
     fq_init(tmp1, fq);
+    fq_init(invtwo, fq);
+    fq_set_ui(invtwo, 2, fq);
+    fq_inv(invtwo, invtwo, fq);
 
     // On traite à part les cas de f0 à f4
     // Initialisation de f0
@@ -66,18 +69,19 @@ void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k,
     fq_poly_set_coeff(tab[3], 0, tmp, fq);
 
     // Initialisation de f4
-    fq_mul(tmp, tmp, a, fq); // tmp = a³
+    fq_pow_ui(tmp, a, 3, fq); // tmp = a³
     fq_sqr(tmp1, b, fq); // tmp1 = b²
     fq_mul_ui(tmp1, tmp1, 8, fq); // tmp1 = 8b²
     fq_add(tmp, tmp, tmp1, fq); // tmp = a³+8b²
     fq_mul_ui(tmp, tmp, 4, fq); // tmp = 4(a³+8b²)
     fq_neg(tmp, tmp,fq); // tmp = -4(a³+8b²)
     fq_poly_set_coeff(tab[4], 0, tmp, fq);
-    fq_mul(tmp, a, b, fq); // tmp = // tmp = ab
+
+    fq_mul(tmp, a, b, fq); // tmp = ab
     fq_mul_ui(tmp, tmp, 16,fq); // tmp = 16ab
     fq_neg(tmp, tmp, fq); // tmp = -16ab
     fq_poly_set_coeff(tab[4], 1, tmp, fq);
-    fq_mul(tmp, a, a, fq); // tmp = a²
+    fq_sqr(tmp, a, fq); // tmp = a²
     fq_mul_ui(tmp, tmp, 20, fq); // tmp = 20a²
     fq_neg(tmp, tmp, fq); // tmp = -20a²
     fq_poly_set_coeff(tab[4], 2, tmp, fq); 
@@ -137,11 +141,13 @@ void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k,
             fq_poly_mul(tmp_poly, tmp_poly, tab[n - 2], fq);
             fq_poly_sub(tab[i], tab[i], tmp_poly, fq);
             fq_poly_mul(tab[i], tab[i], tab[n], fq);
+            fq_poly_scalar_mul_fq(tab[i], tab[i], invtwo, fq);
         }
     }
 
     // Libération de la mémoire
     fq_poly_clear(tmp_poly, fq);
+    fq_clear(invtwo, fq);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,7 +251,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     // Remplissage du tableau
     division_polynomial(tab, a, b, ecc, lmax + 2, fq);
 
-    for(i = 0; i <= lmax + 2 ; i++) { printf("%lu : ", i) ; fq_poly_print_pretty(tab[i], "X", fq) ; printf("\n"); }
+    //for(i = 0; i <= lmax + 2 ; i++) { printf("%lu : ", i) ; fq_poly_print_pretty(tab[i], "X", fq) ; printf("\n"); }
 
 
     // Cas l = 2 :
@@ -301,7 +307,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
             if(fmpz_jacobi(q, l_fmpz) == -1)
             {
                 fmpz_zero(tmp); // tmp = 0
-                fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0); // On fait le théorème chinois
+                fmpz_CRT(trace, trace, M, tmp, l_fmpz, 1); // On fait le théorème chinois
                 printf("t = "); fmpz_print(tmp); printf(" [%lu]\n", l);
                 printf("trace = "); fmpz_print(trace); printf("\n");
             }
@@ -337,7 +343,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
                 {
                     // Cas dans lequel w n'est pas une valeur propre de phi_l
                     fmpz_zero(tmp); // tmp = 0
-                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0); // On fait le théorème chinois
+                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 1); // On fait le théorème chinois
                     printf("t = "); fmpz_print(tmp); printf(" [%lu]\n", l);
                     printf("trace = "); fmpz_print(trace); printf("\n");
                 }
@@ -387,7 +393,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
                     if(fq_poly_is_one(gcd_poly, fq)) fmpz_neg(tmp, tmp); // si pgcd = 1 alors tmp = -2w [l], sinon tmp = 2w [l]
 
                     // On fait le théorème chinois
-                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0);
+                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 1);
                     printf("t = "); fmpz_print(tmp); printf(" [%lu]\n", l);
                     printf("trace = "); fmpz_print(trace); printf("\n");
                 }
@@ -432,7 +438,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
             fq_poly_mul(beta, beta, tab[k], fq);
 
             // On teste tous les tho possible tel que 0 < tho < l
-            for(tho = 1; tho < l/2 ; tho++)
+            for(tho = 1; tho <= (l - 1)/2 ; tho++)
             {
                 fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
                 fq_poly_mul(gcd_poly, frob3, tab[k], fq);
@@ -462,7 +468,11 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                 fq_poly_rem(tmp_poly, gcd_poly, tab[l], fq);
 
-                //fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
+                fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
+                fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
+                printf("pgcd = "); fq_poly_print_pretty(gcd_poly, "X", fq); printf("\n");
+                printf("phil = "); fq_poly_print_pretty(tab[l], "X", fq); printf("\n");
+
 
                 if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq))
                 {
@@ -513,7 +523,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                     if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq)) fmpz_neg(tmp, tmp);
 
-                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 0);
+                    fmpz_CRT(trace, trace, M, tmp, l_fmpz, 1);
                     printf("t = "); fmpz_print(tmp); printf(" [%lu]\n", l);
                     printf("trace = "); fmpz_print(trace); printf("\n");
                     break;
@@ -521,10 +531,12 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
             }
 
         }
-
+        
+        printfmpz("l", l_fmpz);
+        
         // Incrémentation de la boucle
         fmpz_mul(M, M, l_fmpz);
-        // on fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible
+        // On fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible
         fmpz_nextprime(l_fmpz, l_fmpz);
         if(fmpz_equal(l_fmpz, q)) fmpz_nextprime(l_fmpz, l_fmpz);
         printf("\n");
