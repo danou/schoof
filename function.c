@@ -37,11 +37,9 @@ void fmpz_nextprime(fmpz_t rop, fmpz_t op)
 void division_polynomial(fq_poly_t *tab, fq_t a, fq_t b, fq_poly_t ecc, ulong k, fq_ctx_t fq)
 {
     // Déclaration
-    ulong i, n, e;
+    ulong i, n;
     fq_t tmp, tmp1, invtwo;
     fq_poly_t tmp_poly;
-
-    printf("Fonction polynôme de division\n");
 
     // Initialisation
     fq_init(tmp, fq);
@@ -221,11 +219,12 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
     fq_poly_set_coeff(frob, 1, tmp_fq, fq);
 
     // Initialisation du polynôme X^q²-X
-    fq_poly_set_coeff(frob2, fmpz_get_si(q) ^ 2, one, fq); // je transforme q en slong puissance 2
+    fq_poly_set_coeff(frob2, fmpz_get_si(q) * fmpz_get_si(q), one, fq); // je transforme q en slong puissance 2
     fq_poly_set_coeff(frob2, 1, tmp_fq, fq);
 
     // Initialisation du polynôme X^q² + X^q + X
-    fq_poly_set_coeff(frob3, fmpz_get_si(q) ^ 2, one, fq); // je transforme q en slong puissance 2
+
+    fq_poly_set_coeff(frob3, fmpz_get_si(q) * fmpz_get_si(q) , one, fq); // je transforme q en slong puissance 2
     fq_poly_set_coeff(frob3, fmpz_get_si(q), one, fq);
     fq_poly_set_coeff(frob3, 1, one, fq);
 
@@ -299,10 +298,12 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
         // Test du pgcd
         fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
 
-        //fq_poly_print_pretty(gcd_poly, "X", fq);printf("\n");
+        fq_poly_print_pretty(gcd_poly, "x", fq); printf("\n");
 
         if(!fq_poly_is_one(gcd_poly, fq))
         {
+            printf("Cas amélioration de Schoof\n");
+            
             // Test de q carré modulo l
             if(fmpz_jacobi(q, l_fmpz) == -1)
             {
@@ -390,7 +391,7 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                     // Test du pgcd
                     fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
-                    if(fq_poly_is_one(gcd_poly, fq)) fmpz_neg(tmp, tmp); // si pgcd = 1 alors tmp = -2w [l], sinon tmp = 2w [l]
+                    if(!fq_poly_is_one(gcd_poly, fq)) fmpz_neg(tmp, tmp); // si pgcd = 1 alors tmp = -2w [l], sinon tmp = 2w [l]
 
                     // On fait le théorème chinois
                     fmpz_CRT(trace, trace, M, tmp, l_fmpz, 1);
@@ -410,74 +411,219 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
         {
             printf("Cas de base\n");
 
-            // Initialisation de alpha
-            fmpz_mul(tmp, q, q);
-            fmpz_add_ui(tmp, tmp, 1);
-            fmpz_cdiv_q_ui(tmp, tmp, 2); //tmp = (q² + 1)/2
-
-            fq_set_ui(tmp_fq, 4, fq); // tmp_fq = 4
-
-            fq_poly_pow(alpha, ecc, fmpz_get_si(tmp), fq);
-            fq_poly_scalar_mul_fq(alpha, alpha, tmp_fq, fq);
-            fq_poly_pow(tmp_poly, tab[k], 3, fq);
-            fq_poly_mul(alpha, alpha, tmp_poly, fq);
-            fq_poly_sqr(tmp_poly, tab[k + 1], fq);
-            fq_poly_mul(tmp_poly, tmp_poly, tab[k - 1], fq);
-            fq_poly_sub(alpha, tmp_poly, alpha, fq);
-            fq_poly_sqr(tmp_poly, tab[k - 1], fq);
-            fq_poly_mul(tmp_poly, tmp_poly, tab[k + 2], fq);
-            fq_poly_sub(alpha, tmp_poly, alpha, fq);
-
-            // Initialisation de beta
-            fq_poly_neg(beta, frob2, fq);
-            fq_poly_sqr(tmp_poly, tab[k], fq);
-            fq_poly_mul(beta, beta, tmp_poly, fq);
-            fq_poly_mul(tmp_poly, tab[k - 1], tab[k+1], fq);
-            fq_poly_sub(beta, beta, tmp_poly, fq);
-            fq_poly_scalar_mul_fq(beta, beta, tmp_fq, fq);
-            fq_poly_mul(beta, beta, tab[k], fq);
-
-            // On teste tous les tho possible tel que 0 < tho < l
-            for(tho = 1; tho <= (l - 1)/2 ; tho++)
+            if(k & 0x1) // Test de la parité de k
             {
-                fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
-                fq_poly_mul(gcd_poly, frob3, tab[k], fq);
-                fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
-                fq_poly_sqr(tmp_poly, beta, fq);
-                fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);
-                fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                //Cas k impair
+                // Initialisation de alpha
+                fmpz_mul(tmp, q, q);
+                fmpz_add_ui(tmp, tmp, 3);
+                fmpz_cdiv_q_ui(tmp, tmp, 2); //tmp = (q² + 3)/2
 
+                fq_set_ui(tmp_fq, 4, fq); // tmp_fq = 4
+                fq_poly_sqr(alpha, tab[k - 1], fq);
+                fq_poly_mul(alpha, alpha, tab[k + 2], fq);
+
+                fq_poly_sqr(tmp_poly, tab[k + 1], fq);
+                fq_poly_mul(tmp_poly, tmp_poly, tab[k - 1], fq);
+
+                fq_poly_sub(alpha, alpha, tmp_poly, fq);
+
+                fq_poly_mul(alpha, alpha, ecc, fq);
+
+                fq_poly_pow(tmp_poly, ecc, fmpz_get_si(tmp), fq);
+                fq_poly_scalar_mul_fq(tmp_poly, tmp_poly, tmp_fq, fq);
+                fq_poly_pow(tmp1_poly, tab[k], 3, fq);
+                fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+
+                fq_poly_sub(alpha, tmp_poly, alpha, fq);
+
+
+                // Initialisation de beta
+                fq_poly_neg(beta, frob2, fq);
                 fq_poly_sqr(tmp_poly, tab[k], fq);
-                fq_poly_sqr(tmp1_poly, alpha, fq);
-                fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
-                fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
-                fq_poly_pow(tmp_poly, tab[tho], 2 * fmpz_get_si(q), fq);
-                fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                fq_poly_mul(beta, beta, tmp_poly, fq);
+                fq_poly_mul(tmp_poly, tab[k - 1], tab[k+1], fq);
+                fq_poly_sub(beta, beta, tmp_poly, fq);
+                fq_poly_scalar_mul_fq(beta, beta, tmp_fq, fq);
+                fq_poly_mul(beta, beta, tab[k], fq);
+            }
+            else
+            {
+                //Cas k pair
+                // Initialisation de alpha
+                fmpz_mul(tmp, q, q);
+                fmpz_add_ui(tmp, tmp, 1);
+                fmpz_cdiv_q_ui(tmp, tmp, 2); //tmp = (q² + 1)/2
 
+                fq_set_ui(tmp_fq, 4, fq); // tmp_fq = 4
+
+                fq_poly_pow(alpha, ecc, fmpz_get_si(tmp), fq);
+                fq_poly_scalar_mul_fq(alpha, alpha, tmp_fq, fq);
+                fq_poly_pow(tmp_poly, tab[k], 3, fq);
+                fq_poly_mul(alpha, alpha, tmp_poly, fq);
+                fq_poly_sqr(tmp_poly, tab[k + 1], fq);
+                fq_poly_mul(tmp_poly, tmp_poly, tab[k - 1], fq);
+                fq_poly_sub(alpha, tmp_poly, alpha, fq);
+                fq_poly_sqr(tmp_poly, tab[k - 1], fq);
+                fq_poly_mul(tmp_poly, tmp_poly, tab[k + 2], fq);
+                fq_poly_sub(alpha, tmp_poly, alpha, fq);
+
+                // Initialisation de beta
+                fq_poly_neg(beta, frob2, fq);
                 fq_poly_sqr(tmp_poly, tab[k], fq);
-                fq_poly_sqr(tmp1_poly,beta, fq);
-                fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
-                fq_poly_sqr(tmp1_poly, ecc, fq);
-                fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
-                fq_poly_pow(tmp1_poly, tab[tho - 1], fmpz_get_si(q), fq);
-                fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
-                fq_poly_pow(tmp1_poly, tab[tho + 1], fmpz_get_si(q), fq);
-                fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
-                fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                fq_poly_mul(beta, beta, tmp_poly, fq);
+                fq_poly_mul(beta, beta, ecc, fq);
+                fq_poly_mul(tmp_poly, tab[k - 1], tab[k+1], fq);
+                fq_poly_sub(beta, beta, tmp_poly, fq);
+                fq_poly_scalar_mul_fq(beta, beta, tmp_fq, fq);
+                fq_poly_mul(beta, beta, tab[k], fq);
+                fq_poly_mul(beta, beta, ecc, fq);
+            }
 
+            // On teste tous les tho possible tel que 0 < tho < (l-1)/2
+            for(tho = 1; tho <= (l - 1) / 2 ; tho++)
+            {
+                if(k & 0x1) // Test de la parité de k
+                {
+                    if(tho & 0x1)
+                    {
+                        printf("Cas k impair et tho impair\n");
+                        fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
+                        fq_poly_mul(gcd_poly, gcd_poly, ecc, fq);
+                        fq_poly_mul(tmp_poly, frob3, tab[k], fq);
+                        fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq); //beta -> y beta
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly, alpha, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_pow(tmp_poly, tab[tho], 2 * fmpz_get_si(q), fq);
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
 
-                fq_poly_rem(tmp_poly, gcd_poly, tab[l], fq);
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly,beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_pow(tmp1_poly, ecc, fmpz_get_si(q) + 1, fq); 
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq); // yq et //beta -> y beta
+                        fq_poly_pow(tmp1_poly, tab[tho - 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_pow(tmp1_poly, tab[tho + 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                    }
+                    else
+                    {
+                        printf("Cas k impair et tho pair\n");
+                        fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
+                        fq_poly_mul(gcd_poly, gcd_poly, ecc, fq);
+                        fq_poly_mul(tmp_poly, frob3, tab[k], fq);
+                        fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq); //beta -> y beta
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly, alpha, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_pow(tmp_poly, tab[tho], 2 * fmpz_get_si(q), fq);
+                        fq_poly_pow(tmp1_poly, ecc, fmpz_get_si(q), fq); //y2q
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
 
-                fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly,beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq); // y2
+                        fq_poly_pow(tmp1_poly, tab[tho - 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_pow(tmp1_poly, tab[tho + 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                    }
+                }
+                else
+                {
+                    if(tho & 0x1)
+                    {
+                        printf("Cas k pair et tho impair\n");
+                        fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
+                        fq_poly_mul(tmp_poly, frob3, tab[k], fq);
+                        fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);   //  alpha -> y alpha
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly, alpha, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);  // y2
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_pow(tmp_poly, tab[tho], 2 * fmpz_get_si(q), fq);
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly,beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        /*
+                        fq_poly_sqr(tmp1_poly, ecc, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        */
+
+                        fq_poly_pow(tmp1_poly, ecc, fmpz_get_si(q) + 1, fq); // y2q+2  
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_pow(tmp1_poly, tab[tho - 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_pow(tmp1_poly, tab[tho + 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                    }
+                    else
+                    {
+                        printf("Cas k pair et tho pair\n");
+                        fq_poly_mul(gcd_poly, tab[k - 1], tab[k + 1], fq);
+                        fq_poly_mul(tmp_poly, frob3, tab[k], fq);
+                        fq_poly_sub(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, beta, fq);
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly, alpha, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq);   //  alpha -> y alpha
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                        fq_poly_pow(tmp_poly, tab[tho], 2 * fmpz_get_si(q), fq);
+                        fq_poly_pow(tmp1_poly, ecc, fmpz_get_si(q), fq);  // y2q
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq); 
+                        fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
+
+                        fq_poly_sqr(tmp_poly, tab[k], fq);
+                        fq_poly_sqr(tmp1_poly,beta, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        /*
+                        fq_poly_sqr(tmp1_poly, ecc, fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        */
+                        fq_poly_mul(tmp_poly, tmp_poly, ecc, fq); // y2
+                        fq_poly_pow(tmp1_poly, tab[tho - 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_pow(tmp1_poly, tab[tho + 1], fmpz_get_si(q), fq);
+                        fq_poly_mul(tmp_poly, tmp_poly, tmp1_poly, fq);
+                        fq_poly_add(gcd_poly, gcd_poly, tmp_poly, fq);
+                    }
+                }
+
                 fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
                 printf("pgcd = "); fq_poly_print_pretty(gcd_poly, "X", fq); printf("\n");
                 printf("phil = "); fq_poly_print_pretty(tab[l], "X", fq); printf("\n");
 
 
-                if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq))
+                if(!fq_poly_is_one(gcd_poly, fq))
                 {
                     fq_set_ui(tmp_fq, 2, fq);
-                    fq_poly_set_coeff(gcd_poly, fmpz_get_si(q) ^ 2, tmp_fq, fq);
+                    fq_poly_set_coeff(gcd_poly, fmpz_get_si(q) * fmpz_get_si(q), tmp_fq, fq);
                     fq_poly_set_coeff(gcd_poly, 1, one, fq);
                     fq_poly_sqr(tmp_poly, tab[k], fq);
                     fq_poly_mul(gcd_poly, gcd_poly, tmp_poly, fq);
@@ -516,12 +662,13 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
 
                     fmpz_set_ui(tmp, tho);
 
-                    fq_poly_rem(tmp_poly, gcd_poly, tab[l], fq);
+                    fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
+                    fq_poly_gcd(gcd_poly, gcd_poly, tab[l], fq);
+                    printf("pgcd = "); fq_poly_print_pretty(gcd_poly, "X", fq); printf("\n");
+                    printf("phil = "); fq_poly_print_pretty(tab[l], "X", fq); printf("\n");
 
-                    //fq_poly_print_pretty(tmp_poly, "X", fq);printf("\n");
 
-
-                    if(fq_poly_divides(tmp_poly, gcd_poly, tab[l], fq)) fmpz_neg(tmp, tmp);
+                    if(!fq_poly_is_one(gcd_poly, fq)) fmpz_neg(tmp, tmp);
 
                     fmpz_CRT(trace, trace, M, tmp, l_fmpz, 1);
                     printf("t = "); fmpz_print(tmp); printf(" [%lu]\n", l);
@@ -531,9 +678,9 @@ void schoof(fmpz_t card, fq_t a, fq_t b, fmpz_t q, fq_ctx_t fq)
             }
 
         }
-        
+
         printfmpz("l", l_fmpz);
-        
+
         // Incrémentation de la boucle
         fmpz_mul(M, M, l_fmpz);
         // On fait la boucle jusqu'à obtenir un nombre premier, il devrait il y avoir des améliorations possible

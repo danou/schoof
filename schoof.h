@@ -7,6 +7,7 @@
 #include <flint/fq_poly.h>
 
 #define printfmpz(x,y) printf("%s :", (x)); fmpz_print((y)); printf("\n");
+#define printfqpoly(x,y,z) printf("%s :", (x)); fq_poly_print_pretty((y),"x", (z)); printf("\n");
 
 // Déclaration de fonction
 void fmpz_nextprime(fmpz_t rop, fmpz_t op);
