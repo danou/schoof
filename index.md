@@ -13,4 +13,6 @@ addons:
 
 ## [PDF](rapport/Rapport.pdf)
 
+## [Beamer](beamer/beamer.pdf)
+
 ## [Sources](https://github.com/danou/schoof/)
